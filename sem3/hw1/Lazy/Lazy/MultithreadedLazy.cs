@@ -4,29 +4,17 @@ using System.Threading;
 namespace Lazy
 {
     /// <summary>
-    /// 
+    /// ILazy implementation that guarantee correct work in multithreaded mode.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Type of the calculating value.</typeparam>
     public class MultithreadedLazy<T> : ILazy<T>
     {
-        /// <summary>
-        ///  
-        /// </summary>
         private bool isCalculated = false;
 
-        /// <summary>
-        /// 
-        /// </summary>
         private Func<T> supplier;
 
-        /// <summary>
-        /// 
-        /// </summary>
         private T result;
 
-        /// <summary>
-        /// 
-        /// </summary>
         private object locker = new object();
 
         public MultithreadedLazy(Func<T> supplier)
@@ -40,9 +28,9 @@ namespace Lazy
         }
 
         /// <summary>
-        /// 
+        /// Gets result of the calculation if it is not already calculated.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Result of the calculation.</returns>
         public T Get()
         {
             if (!isCalculated)
