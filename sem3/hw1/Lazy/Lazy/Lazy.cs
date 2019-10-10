@@ -16,12 +16,7 @@ namespace Lazy
 
         public Lazy(Func<T> supplier)
         {
-            if (supplier == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            this.supplier = supplier;
+            this.supplier = supplier ?? throw new ArgumentNullException();
         }
 
         /// <summary>
