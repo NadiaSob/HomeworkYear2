@@ -18,7 +18,7 @@ namespace Lazy
         /// <summary>
         /// Returns ILazy object that guarantee correct work in multithreaded mode.
         /// </summary>
-        /// <param name="supplier"></param>
+        /// <param name="supplier">Object that does the calculation.</param>
         /// <returns>ILazy object that guarantee correct work in multithreaded mode.</returns>
         public static ILazy<T> CreateMultithreadedLazy(Func<T> supplier) => new MultithreadedLazy<T>(supplier);
     }

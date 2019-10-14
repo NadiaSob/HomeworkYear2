@@ -9,13 +9,13 @@ namespace Lazy
     /// <typeparam name="T">Type of the calculating value.</typeparam>
     public class MultithreadedLazy<T> : ILazy<T>
     {
-        private bool isCalculated = false;
+        private volatile bool isCalculated = false;
 
         private Func<T> supplier;
 
         private T result;
 
-        private object locker = new object();
+        private readonly object locker = new object();
 
         public MultithreadedLazy(Func<T> supplier)
         {

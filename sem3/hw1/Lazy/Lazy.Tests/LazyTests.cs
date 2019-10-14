@@ -39,10 +39,10 @@ namespace Lazy.Tests
         [TestMethod]
         public void ReturningSameResultSeveralTimesTest()
         {
-            lazy = LazyFactory<int>.CreateLazy(() => 123 + 77);
-            Assert.AreEqual(200, lazy.Get());
-            Assert.AreEqual(200, lazy.Get());
-            Assert.AreEqual(200, lazy.Get());
+            var stringLazy = LazyFactory<string>.CreateLazy(() => "Test string");
+            var firstGet = stringLazy.Get();
+            var secondGet = stringLazy.Get();
+            Assert.AreEqual(firstGet, secondGet);
         }
 
         [TestMethod]
