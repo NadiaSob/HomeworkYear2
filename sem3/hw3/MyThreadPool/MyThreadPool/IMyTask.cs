@@ -18,6 +18,6 @@ namespace MyThreadPool
         /// </summary>
         TResult Result { get; }
 
-        IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> newTask);
+        IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> newSupplier);
     }
 }
