@@ -1,7 +1,7 @@
 image: Visual Studio 2017
 
 before_build:
-  - nuget restore sem3/hw1/Lazy/Lazy.sln
+  - nuget restore sem3/test1/test1.sln
 
 build:
-  project: sem3/hw1/Lazy/Lazy.sln
+  project: sem3/test1/test1.sln
