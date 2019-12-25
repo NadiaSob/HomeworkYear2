@@ -72,10 +72,10 @@ namespace test4
                     Monitor.Wait(lockObject);
                 }
 
-                element = list.First().Value.Dequeue();
-                if (list.First().Value.Count == 0)
+                element = list.Last().Value.Dequeue();
+                if (list.Last().Value.Count == 0)
                 {
-                    list.Remove(list.First().Key);
+                    list.Remove(list.Last().Key);
                 }
             }
             return element;
