@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace MyThreadPool
 {
+    /// <summary>
+    /// Provides a pool of threads that can be used to execute tasks.
+    /// </summary>
     public class MyThreadPool
     {
-        /// <summary>
-        /// Очередь задач, принятых к исполнению.
-        /// </summary>
         private ConcurrentQueue<Action> taskQueue;
 
-        /// <summary>
-        /// Возвращает связанный с ним CancellationToken.
-        /// </summary>
         private CancellationTokenSource cancellationToken;
 
         private Thread[] threads;
@@ -66,6 +60,12 @@ namespace MyThreadPool
             }
         }
 
+        /// <summary>
+        /// Queues a task for thread pool execution.
+        /// </summary>
+        /// <typeparam name="TResult">Type of the task result.</typeparam>
+        /// <param name="supplier">Function on the basis of which the task is going to be created.</param>
+        /// <returns>Queued task.</returns>
         public IMyTask<TResult> AddTask<TResult>(Func<TResult> supplier)
         {
             if (cancellationToken.Token.IsCancellationRequested)
@@ -81,7 +81,7 @@ namespace MyThreadPool
         }
 
         /// <summary>
-        /// Завершает работу потоков.
+        /// Shuts down threads.
         /// </summary>
         public void Shutdown()
         {
@@ -90,8 +90,14 @@ namespace MyThreadPool
 
         private class MyTask<TResult> : IMyTask<TResult>
         {
+            /// <summary>
+            /// Indicates whether the task is completed.
+            /// </summary>
             public bool IsCompleted { get; private set; } = false;
 
+            /// <summary>
+            /// Result of the task.
+            /// </summary>
             public TResult Result { 
                 get
                 {
@@ -133,6 +139,9 @@ namespace MyThreadPool
                 this.myThreadPool = myThreadPool;
             }
 
+            /// <summary>
+            /// Calculates the task.
+            /// </summary>
             public void Calculate()
             {
                 try
@@ -159,6 +168,12 @@ namespace MyThreadPool
                 }
             }
 
+            /// <summary>
+            /// Creates a new task which is applied to the result of this task. The new task is accepted for execution.
+            /// </summary>
+            /// <typeparam name="TNewResult">Type of the new task result.</typeparam>
+            /// <param name="newSupplier">Function on the basis of which the new task is going to be created.</param>
+            /// <returns>New task which is applied to the result of this task.</returns>
             public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> newSupplier)
             {
                 var newTask = new MyTask<TNewResult>(() => newSupplier(Result), myThreadPool);
