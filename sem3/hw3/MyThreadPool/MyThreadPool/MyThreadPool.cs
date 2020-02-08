@@ -10,6 +10,8 @@ namespace MyThreadPool
     /// </summary>
     public class MyThreadPool
     {
+        public int NumberOfThreads { get; private set; }
+
         private ConcurrentQueue<Action> taskQueue;
 
         private CancellationTokenSource cancellationToken;
@@ -28,6 +30,7 @@ namespace MyThreadPool
             taskQueue = new ConcurrentQueue<Action>();
             cancellationToken = new CancellationTokenSource();
             newTaskAvailable = new AutoResetEvent(false);
+            NumberOfThreads = numberOfThreads;
             CreateThreads(numberOfThreads);
         }
 
