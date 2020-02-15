@@ -77,10 +77,15 @@ namespace MyThreadPool
             }
 
             var myTask = new MyTask<TResult>(supplier, this);
-            taskQueue.Enqueue(myTask.Calculate);
-            newTaskAvailable.Set();
+            EnqueueTask(myTask.Calculate);
 
             return myTask;
+        }
+
+        private void EnqueueTask(Action task)
+        {
+            taskQueue.Enqueue(task);
+            newTaskAvailable.Set();
         }
 
         /// <summary>
@@ -149,7 +154,7 @@ namespace MyThreadPool
             {
                 try
                 {
-                    Result = supplier();
+                    result = supplier();
                 }
                 catch (Exception exception)
                 {
@@ -165,7 +170,7 @@ namespace MyThreadPool
                     {
                         while (localTaskQueue.Count != 0)
                         {
-                            myThreadPool.AddTask(localTaskQueue.Dequeue);
+                            myThreadPool.EnqueueTask(localTaskQueue.Dequeue());
                         }
                     }
                 }
@@ -185,7 +190,7 @@ namespace MyThreadPool
                 {
                     if (!IsCompleted)
                     {
-                        localTaskQueue.Enqueue(() => newSupplier(Result));
+                        localTaskQueue.Enqueue(newTask.Calculate);
                         return newTask;
                     }
                 }
