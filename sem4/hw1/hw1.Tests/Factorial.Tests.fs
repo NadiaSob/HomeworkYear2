@@ -2,6 +2,7 @@
 
 open NUnit.Framework
 open Factorial
+open System
 
 [<TestCase(1, 1)>]
 [<TestCase(1, 0)>]
@@ -13,3 +14,10 @@ open Factorial
 [<Test>]
 let factorialTest result number =
     Assert.AreEqual(result, factorial number)
+
+[<TestCase(-1)>]
+[<TestCase(-10)>]
+[<TestCase(-12345)>]
+[<Test>]
+let incorrectInputFactorialTest number =
+    Assert.Throws<ArgumentOutOfRangeException>(fun () -> factorial number |> ignore) |> ignore

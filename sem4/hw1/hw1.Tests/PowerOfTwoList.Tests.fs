@@ -2,6 +2,7 @@
 
 open NUnit.Framework
 open PowerOfTwoList
+open System
 
 let testCases =
     [
@@ -15,3 +16,11 @@ let testCases =
 [<Test>]
 let powerOfTwoListTest list n m =
     Assert.AreEqual(list, powerOfTwoList n m)
+
+[<TestCase(-1, 4)>]
+[<TestCase(6, -7)>]
+[<TestCase(-12, -5)>]
+[<TestCase(-123, -123)>]
+[<Test>]
+let incorrectInputFibonacciTest n m =
+    Assert.Throws<ArgumentOutOfRangeException>(fun () -> powerOfTwoList n m |> ignore) |> ignore
