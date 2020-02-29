@@ -2,5 +2,6 @@ image: Visual Studio 2017
 
 before_build:
   - nuget restore sem3/test4/test4.sln
+  
 build:
   project: sem3/test4/test4.sln
