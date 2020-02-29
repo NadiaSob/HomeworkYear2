@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace SimpleFTP
 {
+    /// <summary>
+    /// Class implementing FTP client.
+    /// </summary>
     public class Client
     {
         private static TcpClient client;
@@ -17,6 +20,9 @@ namespace SimpleFTP
 
         private StreamReader reader;
 
+        /// <summary>
+        /// Indicates whether the client is connected to the server.
+        /// </summary>
         public bool IsConnected { get; private set; }
 
         public Client(string hostname, int port)
@@ -25,6 +31,9 @@ namespace SimpleFTP
             this.port = port;
         }
 
+        /// <summary>
+        /// Connects client to the server.
+        /// </summary>
         public void Connect()
         {
             try
@@ -42,6 +51,12 @@ namespace SimpleFTP
             }
         }
 
+        /// <summary>
+        /// Sends a request to list all files and directories at the given path on the server
+        /// </summary>
+        /// <param name="path">Path to the directory on the server to list all files and directories in.</param>
+        /// <returns>String "size (name isDir)* " where "size" is a number of files and folders in the directory,
+        /// "name" is a name of a file or a folder and "isDir" is bool value indicating whether it is directory."</returns>
         public async Task<string> List(string path)
         {
             var response = await MakeRequest(1, path);
@@ -56,6 +71,11 @@ namespace SimpleFTP
             }
         }
 
+        /// <summary>
+        /// Sends a request to get a file from server. 
+        /// </summary>
+        /// <param name="path">Path to the file to get.</param>
+        /// <returns>String "size content", where "size" is a size of the file and "content" is a file content.</returns>
         public async Task<string> Get(string path)
         {
             var response = await MakeRequest(2, path);
@@ -83,6 +103,9 @@ namespace SimpleFTP
             }
         }
 
+        /// <summary>
+        /// Stops the client.
+        /// </summary>
         public void Stop()
         {
             writer?.Close();

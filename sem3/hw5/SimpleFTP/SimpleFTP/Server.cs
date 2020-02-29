@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace SimpleFTP
 {
+    /// <summary>
+    /// Class implementing FTP server.
+    /// </summary>
     public class Server
     {
         private readonly TcpListener listener;
@@ -20,6 +23,9 @@ namespace SimpleFTP
             listener = new TcpListener(IPAddress.Any, port);
         }
 
+        /// <summary>
+        /// Starts server's work.
+        /// </summary>
         public async Task Start()
         {
             try
@@ -101,6 +107,9 @@ namespace SimpleFTP
             await writer.WriteLineAsync($"{size} {content}");
         }
 
+        /// <summary>
+        /// Stops the server.
+        /// </summary>
         public void Stop()
         {
             cancellationToken.Cancel();
