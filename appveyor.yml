@@ -1,7 +1,7 @@
 image: Visual Studio 2017
 
 before_build:
-  - nuget restore sem4/hw1/hw1.sln
-
+  - nuget restore sem3/test4/test4.sln
+  
 build:
-  project: sem4/hw1/hw1.sln
+  project: sem3/test4/test4.sln
