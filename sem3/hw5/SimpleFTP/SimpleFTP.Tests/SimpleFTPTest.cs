@@ -39,16 +39,6 @@ namespace SimpleFTP.Tests
         }
 
         [TestMethod]
-        public async Task ListInEmptyDirectoryTest()
-        {
-            Start();
-            var response = await client.List(path + "\\TestDirectory1");
-            var expected = "0 ";
-            Assert.AreEqual(expected, response);
-            Stop();
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(DirectoryNotFoundException))]
         public async Task DirectoryDoNotExistListTest()
         {
@@ -79,7 +69,7 @@ namespace SimpleFTP.Tests
 
         private Client client;
         private Server server;
-        private string path = "..\\..\\..\\SimpleFTP.Tests\\TestFiles";
-        private string filePath = "..\\..\\..\\SimpleFTP.Tests\\TestFiles\\testfile.txt";
+        private readonly string path = "..\\..\\..\\SimpleFTP.Tests\\TestFiles";
+        private readonly string filePath = "..\\..\\..\\SimpleFTP.Tests\\TestFiles\\testfile.txt";
     }
 }
