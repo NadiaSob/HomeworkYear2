@@ -1,7 +1,7 @@
 image: Visual Studio 2017
 
 before_build:
-  - nuget restore sem3/hw3/MyThreadPool/MyThreadPool.sln
+  - nuget restore sem4/hw1/hw1.sln
 
 build:
-  project: sem3/hw3/MyThreadPool/MyThreadPool.sln
+  project: sem4/hw1/hw1.sln
