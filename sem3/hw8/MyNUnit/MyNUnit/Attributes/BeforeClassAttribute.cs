@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyNUnit.Attributes
 {
-    public class BeforeClassAttribute
+    public class BeforeClassAttribute : Attribute
     {
     }
 }

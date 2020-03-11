@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
@@ -11,10 +10,17 @@ using System.Diagnostics;
 
 namespace MyNUnit
 {
+    /// <summary>
+    /// Class that runs tests in all assemblies located in the given path.
+    /// </summary>
     public class MyNUnit
     {
         private readonly ConcurrentBag<TestInfo> testsInfo = new ConcurrentBag<TestInfo>();
 
+        /// <summary>
+        /// Runs tests in all assemblies located in the given path.
+        /// </summary>
+        /// <param name="path">Path in which the assemblies are located.</param>
         public void RunTests(string path)
         {
             var types = GetAssemblies(path).SelectMany(a => a.GetTypes());
@@ -84,24 +90,51 @@ namespace MyNUnit
 
             var instance = Activator.CreateInstance(type);
 
-            //Проверить на непустоту списков
-            Parallel.ForEach(beforeClassMethods, method => RunMethod(method, null));
-            Parallel.ForEach(testMethods, test => RunTest(test, instance, beforeMethods, afterMethods));
-            Parallel.ForEach(afterClassMethods, method => RunMethod(method, null));
+            if (beforeClassMethods.Count() != 0)
+            {
+                Parallel.ForEach(beforeClassMethods, method =>
+                {
+                    if (!method.IsStatic)
+                    {
+                        throw new InvalidOperationException("BeforeClass method must be static");
+                    }
+                    RunMethod(method, null);
+                });
+            }
+
+            if (testMethods.Count() != 0)
+            {
+                Parallel.ForEach(testMethods, test => RunTest(test, instance, beforeMethods, afterMethods));
+            }
+
+            if (afterClassMethods.Count() != 0)
+            {
+                Parallel.ForEach(afterClassMethods, method =>
+                {
+                    if (!method.IsStatic)
+                    {
+                        throw new InvalidOperationException("AfterClass method must be static");
+                    }
+                    RunMethod(method, null);
+                });
+            }
         }
 
         private void RunTest(MethodInfo test, object instance, List<MethodInfo> beforeMethods, List<MethodInfo> afterMethods)
         {
-            Parallel.ForEach(beforeMethods, method => RunMethod(method, instance));
+            if (beforeMethods.Count() != 0)
+            {
+                Parallel.ForEach(beforeMethods, method => RunMethod(method, instance));
+            }
 
             var attribute = test.GetCustomAttribute<TestAttribute>();
 
-            string className = test.DeclaringType.Name;
-            string name = test.Name;
-            bool isPassed = false;
-            bool isIgnored = false;
+            var className = test.DeclaringType.Name;
+            var name = test.Name;
+            var isPassed = false;
+            var isIgnored = false;
+            var time = TimeSpan.Zero;
             string ignoringReason = null;
-            TimeSpan time = TimeSpan.Zero;
 
             TestInfo testInfo = null;
 
@@ -143,12 +176,18 @@ namespace MyNUnit
                 testInfo = new TestInfo(className, name, isPassed, isIgnored, ignoringReason, time);
                 testsInfo.Add(testInfo);
 
-                Parallel.ForEach(afterMethods, method => RunMethod(method, instance));
+                if (afterMethods.Count() != 0)
+                {
+                    Parallel.ForEach(afterMethods, method => RunMethod(method, instance));
+                }
             }
         }
 
         private void RunMethod(MethodInfo method, object instance) => method.Invoke(instance, null);
 
+        /// <summary>
+        /// Prints a report about the result of tests execution. 
+        /// </summary>
         public void PrintReport()
         {
             Console.WriteLine($"Tests found: {testsInfo.Count()}");
@@ -159,14 +198,15 @@ namespace MyNUnit
             {
                 Console.WriteLine($"Test: {test.Name}");
                 Console.WriteLine($"Class: {test.ClassName}");
-                Console.WriteLine($"Time: {test.Time.TotalSeconds} seconds");
 
                 if (test.IsIgnored)
                 {
-                    Console.WriteLine($"Test is ignored because: {test.IgnoringReason}");
+                    Console.WriteLine("Test is ignored");
+                    Console.WriteLine($"Reason of being ignored: {test.IgnoringReason}");
                 }
                 else
                 {
+                    Console.WriteLine($"Time: {test.Time.TotalSeconds} seconds");
                     if (test.IsPassed)
                     {
                         Console.WriteLine("Passed!");
