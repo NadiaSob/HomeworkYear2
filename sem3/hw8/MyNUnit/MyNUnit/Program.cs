@@ -12,7 +12,9 @@ namespace MyNUnit
         static void Main(string[] args)
         {
             var myNUnit = new MyNUnit();
-            myNUnit.RunTests("..\\..\\..\\TestProject.Tests\\bin");
+            var path = args[0];
+
+            myNUnit.RunTests(path);
             myNUnit.PrintReport();
         }
     }

@@ -15,7 +15,10 @@ namespace MyNUnit
     /// </summary>
     public class MyNUnit
     {
-        private readonly ConcurrentBag<TestInfo> testsInfo = new ConcurrentBag<TestInfo>();
+        /// <summary>
+        /// Collection of the TestsInfo elements.
+        /// </summary>
+        public ConcurrentBag<TestInfo> TestsInfo { get; private set; } = new ConcurrentBag<TestInfo>();
 
         /// <summary>
         /// Runs tests in all assemblies located in the given path.
@@ -144,7 +147,7 @@ namespace MyNUnit
                 ignoringReason = attribute.Ignore;
                 isPassed = true;
                 testInfo = new TestInfo(className, name, isPassed, isIgnored, ignoringReason, time);
-                testsInfo.Add(testInfo);
+                TestsInfo.Add(testInfo);
                 return;
             }
 
@@ -174,7 +177,7 @@ namespace MyNUnit
                 stopwatch.Stop();
                 time = stopwatch.Elapsed;
                 testInfo = new TestInfo(className, name, isPassed, isIgnored, ignoringReason, time);
-                testsInfo.Add(testInfo);
+                TestsInfo.Add(testInfo);
 
                 if (afterMethods.Count() != 0)
                 {
@@ -190,11 +193,12 @@ namespace MyNUnit
         /// </summary>
         public void PrintReport()
         {
-            Console.WriteLine($"Tests found: {testsInfo.Count()}");
+            Console.WriteLine($"Tests found: {TestsInfo.Count()}");
+            Console.WriteLine();
 
             var allTestsPassed = true;
 
-            foreach (var test in testsInfo)
+            foreach (var test in TestsInfo)
             {
                 Console.WriteLine($"Test: {test.Name}");
                 Console.WriteLine($"Class: {test.ClassName}");
@@ -220,7 +224,7 @@ namespace MyNUnit
                 Console.WriteLine();
             }
 
-            if (testsInfo.Count() != 0)
+            if (TestsInfo.Count() != 0)
             {
                 if (allTestsPassed)
                 {
