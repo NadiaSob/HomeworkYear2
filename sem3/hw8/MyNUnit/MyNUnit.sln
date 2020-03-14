@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExceptionTestProject", "Exc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IgnoreTestProject", "IgnoreTestProject\IgnoreTestProject.csproj", "{A33A535D-AF0E-43F2-B035-DC913CDCEA8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncorrectTestProject", "IncorrectTestProject\IncorrectTestProject.csproj", "{286A4BC9-78A7-4905-9A5D-09C76549F957}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{A33A535D-AF0E-43F2-B035-DC913CDCEA8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A33A535D-AF0E-43F2-B035-DC913CDCEA8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A33A535D-AF0E-43F2-B035-DC913CDCEA8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{286A4BC9-78A7-4905-9A5D-09C76549F957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{286A4BC9-78A7-4905-9A5D-09C76549F957}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{286A4BC9-78A7-4905-9A5D-09C76549F957}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{286A4BC9-78A7-4905-9A5D-09C76549F957}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

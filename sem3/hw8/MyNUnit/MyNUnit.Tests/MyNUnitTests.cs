@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using BeforeAndAfterClassTestProject;
-using BeforeAndAfterTestProject;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MyNUnit.Tests
@@ -160,29 +158,156 @@ namespace MyNUnit.Tests
         }
 
         [TestMethod]
-        public void BeforeAndAfterClassMethodsTest()
+        public void AfterMethodsTest()
         {
-            BeforeAndAfterClassTests.TestArray = new int[] { 0, 0, 0 };
-            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterTestProject\\bin");
 
-            for (var i = 0; i < 3; ++i)
+            var afterTestInfo = new ConcurrentBag<TestInfo>();
+
+            foreach (var info in testInfo)
             {
-                Assert.AreEqual(i + 1, BeforeAndAfterClassTests.TestArray[i]);
+                if (info.ClassName == "AfterTests")
+                {
+                    afterTestInfo.Add(info);
+                }
             }
-            Assert.AreEqual(4, BeforeAndAfterClassTests.Count);
+            Assert.AreEqual(2, afterTestInfo.Count());
+            var foundTests = new bool[2];
+            foreach (var info in afterTestInfo)
+            {
+                for (var i = 0; i < 2; ++i)
+                {
+                    if (info.Name == $"AfterTest{i + 1}")
+                    {
+                        foundTests[i] = true;
+                    }
+                }
+                Assert.IsFalse(info.IsIgnored);
+                Assert.IsNull(info.IgnoringReason);
+                Assert.AreNotEqual(TimeSpan.Zero, info.Time);
+            }
+
+            afterTestInfo.TryTake(out var test1);
+            afterTestInfo.TryTake(out var test2);
+            Assert.IsTrue(test1.IsPassed || test2.IsPassed);
+            Assert.IsTrue(!test1.IsPassed || !test2.IsPassed);
+
+            foreach (var foundTest in foundTests)
+            {
+                Assert.IsTrue(foundTest);
+            }
         }
 
         [TestMethod]
-        public void BeforeAndAfterMethodsTest()
+        public void BeforeMethodsTest()
         {
-            BeforeAndAfterTests.TestArray = new int[] { 0, 0, 0 };
             myNUnit.RunTests("..\\..\\..\\BeforeAndAfterTestProject\\bin");
 
-            for (var i = 0; i < 3; ++i)
+            var beforeTestInfo = new ConcurrentBag<TestInfo>();
+
+            foreach (var info in testInfo)
             {
-                Assert.AreEqual(i + 1, BeforeAndAfterTests.TestArray[i]);
+                if (info.ClassName == "BeforeTests")
+                {
+                    beforeTestInfo.Add(info);
+                }
             }
-            Assert.AreEqual(6, BeforeAndAfterTests.Count);
+            Assert.AreEqual(1, beforeTestInfo.Count());
+            beforeTestInfo.TryTake(out var beforeTest);
+
+            Assert.AreEqual("BeforeTest", beforeTest.Name);
+            Assert.IsTrue(beforeTest.IsPassed);
+            Assert.IsFalse(beforeTest.IsIgnored);
+            Assert.IsNull(beforeTest.IgnoringReason);
+            Assert.AreNotEqual(TimeSpan.Zero, beforeTest.Time);
+        }
+
+
+        [TestMethod]
+        public void BeforeClassMethodsTest()
+        {
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\bin");
+
+            var beforeClassTestInfo = new ConcurrentBag<TestInfo>();
+
+            foreach (var info in testInfo)
+            {
+                if (info.ClassName == "BeforeClassTests")
+                {
+                    beforeClassTestInfo.Add(info);
+                }
+            }
+            Assert.AreEqual(3, beforeClassTestInfo.Count());
+            var foundTests = new bool[3];
+            foreach (var info in beforeClassTestInfo)
+            {
+                for (var i = 0; i < 3; ++i)
+                {
+                    if (info.Name == $"BeforeClassTest{i + 1}")
+                    {
+                        foundTests[i] = true;
+                    }
+                }
+                Assert.IsTrue(info.IsPassed);
+                Assert.IsFalse(info.IsIgnored);
+                Assert.IsNull(info.IgnoringReason);
+                Assert.AreNotEqual(TimeSpan.Zero, info.Time);
+            }
+
+            foreach (var foundTest in foundTests)
+            {
+                Assert.IsTrue(foundTest);
+            }
+        }
+
+        [TestMethod]
+        public void AfterClassMethodsTest()
+        {
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\bin");
+
+            var afterClassTestInfo = new ConcurrentBag<TestInfo>();
+            var additionalAfterClassTestInfo = new ConcurrentBag<TestInfo>();
+
+            foreach (var info in testInfo)
+            {
+                if (info.ClassName == "AfterClassTests")
+                {
+                    afterClassTestInfo.Add(info);
+                }
+                if (info.ClassName == "AdditionalAfterClassTest")
+                {
+                    additionalAfterClassTestInfo.Add(info);
+                }
+            }
+            Assert.AreEqual(2, afterClassTestInfo.Count());
+            Assert.AreEqual(1, additionalAfterClassTestInfo.Count());
+            var foundTests = new bool[2];
+            foreach (var info in afterClassTestInfo)
+            {
+                for (var i = 0; i < 2; ++i)
+                {
+                    if (info.Name == $"AfterClassTest{i + 1}")
+                    {
+                        foundTests[i] = true;
+                    }
+                }
+                Assert.IsTrue(info.IsPassed);
+                Assert.IsFalse(info.IsIgnored);
+                Assert.IsNull(info.IgnoringReason);
+                Assert.AreNotEqual(TimeSpan.Zero, info.Time);
+            }
+
+            foreach (var foundTest in foundTests)
+            {
+                Assert.IsTrue(foundTest);
+            }
+
+            additionalAfterClassTestInfo.TryTake(out var test3);
+            Assert.AreEqual("AfterClassTest3", test3.Name);
+            Assert.IsTrue(test3.IsPassed);
+            Assert.IsFalse(test3.IsIgnored);
+            Assert.IsNull(test3.IgnoringReason);
+            Assert.AreNotEqual(TimeSpan.Zero, test3.Time);
         }
 
         [TestMethod]
@@ -222,6 +347,13 @@ namespace MyNUnit.Tests
             {
                 Assert.IsTrue(foundTest);
             }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void IncorrectMethodsTest()
+        {
+            myNUnit.RunTests("..\\..\\..\\IncorrectTestProject\\bin");
         }
 
         private MyNUnit myNUnit;

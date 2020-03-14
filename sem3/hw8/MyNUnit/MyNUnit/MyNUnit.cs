@@ -27,7 +27,14 @@ namespace MyNUnit
         public void RunTests(string path)
         {
             var types = GetAssemblies(path).SelectMany(a => a.GetTypes());
-            Parallel.ForEach(types, RunMethodsWithAttributes);
+            try
+            {
+                Parallel.ForEach(types, RunMethodsWithAttributes);
+            }
+            catch (AggregateException exception)
+            {
+                throw exception.InnerException;
+            }
         }
 
         private List<Assembly> GetAssemblies(string path)
@@ -95,37 +102,58 @@ namespace MyNUnit
 
             if (beforeClassMethods.Count() != 0)
             {
-                Parallel.ForEach(beforeClassMethods, method =>
+                try
                 {
-                    CheckMethodToBeCorrect(method);
-                    if (!method.IsStatic)
+                    Parallel.ForEach(beforeClassMethods, method =>
                     {
-                        throw new InvalidOperationException("BeforeClass method must be static");
-                    }
-                    RunMethod(method, null);
-                });
+                        CheckMethodToBeCorrect(method);
+                        if (!method.IsStatic)
+                        {
+                            throw new InvalidOperationException("BeforeClass method must be static");
+                        }
+                        RunMethod(method, null);
+                    });
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException;
+                }
             }
 
             if (testMethods.Count() != 0)
             {
-                Parallel.ForEach(testMethods, test =>
+                try
                 {
-                    CheckMethodToBeCorrect(test);
-                    RunTest(test, instance, beforeMethods, afterMethods);
-                });
+                    Parallel.ForEach(testMethods, test =>
+                    {
+                        CheckMethodToBeCorrect(test);
+                        RunTest(test, instance, beforeMethods, afterMethods);
+                    });
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException;
+                }
             }
 
             if (afterClassMethods.Count() != 0)
             {
-                Parallel.ForEach(afterClassMethods, method =>
+                try
                 {
-                    CheckMethodToBeCorrect(method);
-                    if (!method.IsStatic)
+                    Parallel.ForEach(afterClassMethods, method =>
                     {
-                        throw new InvalidOperationException("AfterClass method must be static");
-                    }
-                    RunMethod(method, null);
-                });
+                        CheckMethodToBeCorrect(method);
+                        if (!method.IsStatic)
+                        {
+                            throw new InvalidOperationException("AfterClass method must be static");
+                        }
+                        RunMethod(method, null);
+                    });
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException;
+                }
             }
         }
 
@@ -133,11 +161,18 @@ namespace MyNUnit
         {
             if (beforeMethods.Count() != 0)
             {
-                Parallel.ForEach(beforeMethods, method =>
+                try
                 {
-                    CheckMethodToBeCorrect(method);
-                    RunMethod(method, instance);
-                });
+                    Parallel.ForEach(beforeMethods, method =>
+                    {
+                        CheckMethodToBeCorrect(method);
+                        RunMethod(method, instance);
+                    });
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException;
+                }
             }
 
             var attribute = test.GetCustomAttribute<TestAttribute>();
@@ -191,11 +226,18 @@ namespace MyNUnit
 
                 if (afterMethods.Count() != 0)
                 {
-                    Parallel.ForEach(afterMethods, method =>
+                    try
                     {
-                        CheckMethodToBeCorrect(method);
-                        RunMethod(method, instance);
-                    });
+                        Parallel.ForEach(afterMethods, method =>
+                        {
+                            CheckMethodToBeCorrect(method);
+                            RunMethod(method, instance);
+                        });
+                    }
+                    catch (AggregateException exception)
+                    {
+                        throw exception.InnerException;
+                    }
                 }
             }
         }
