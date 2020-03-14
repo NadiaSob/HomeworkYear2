@@ -161,17 +161,19 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void BeforeAndAfterClassMethodsTest()
         {
-            var testArray = new int[4] { 1, 2, 2, 3 };
+            var testArray = new int[3] { 1, 2, 3 };
 
-            CollectionAssert.AreEqual(testArray, BeforeAndAfterClassTests.TestQueue.ToArray());
+            CollectionAssert.AreEqual(testArray, BeforeAndAfterClassTests.TestArray);
+            Assert.AreEqual(4, BeforeAndAfterClassTests.Count);
         }
 
         [TestMethod]
         public void BeforeAndAfterMethodsTest()
         {
-            var testArray = new int[6] { 1, 2, 3, 1, 2, 3 };
+            var testArray = new int[3] { 1, 2, 3 };
 
-            CollectionAssert.AreEqual(testArray, BeforeAndAfterTests.TestQueue.ToArray());
+            CollectionAssert.AreEqual(testArray, BeforeAndAfterTests.TestArray);
+            Assert.AreEqual(6, BeforeAndAfterTests.Count);
         }
 
         [TestMethod]

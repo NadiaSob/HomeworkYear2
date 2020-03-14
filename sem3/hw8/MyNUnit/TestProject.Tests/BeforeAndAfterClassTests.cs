@@ -5,23 +5,48 @@ namespace TestProject.Tests
 {
     public class BeforeAndAfterClassTests
     {
-        public static ConcurrentQueue<int> TestQueue { get; private set; }
-            = new ConcurrentQueue<int>();
+        public static int[] TestArray { get; private set; }
+        public static int Count { get; set; }
+        private static readonly object lockObject = new object();
 
         [BeforeClass]
         public static void BeforeClassMethod()
         {
-            TestQueue = new ConcurrentQueue<int>();
-            TestQueue.Enqueue(1);
+            lock (lockObject)
+            {
+                TestArray = new int[3];
+                TestArray[0] = 1;
+                Count = 1;
+            }
         }
 
         [Test]
-        public void BeforeAndAfterClassTest1() => TestQueue.Enqueue(2);
+        public void BeforeAndAfterClassTest1()
+        {
+            lock (lockObject)
+            {
+                TestArray[1] = 2;
+                ++Count;
+            }
+        }
 
         [Test]
-        public void BeforeAndAfterClassTest2() => TestQueue.Enqueue(2);
+        public void BeforeAndAfterClassTest2()
+        {
+            lock (lockObject)
+            {
+                ++Count;
+            }
+        }
 
         [AfterClass]
-        public static void AfterClassMethod() => TestQueue.Enqueue(3);
+        public static void AfterClassMethod()
+        {
+            lock (lockObject)
+            {
+                TestArray[2] = 3;
+                ++Count;
+            }
+        }
     }
 }
