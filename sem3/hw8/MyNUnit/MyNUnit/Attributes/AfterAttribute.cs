@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyNUnit.Attributes
 {
+    /// <summary>
+    /// Attribute for the method to be invoked after each test in class.
+    /// </summary>
     public class AfterAttribute : Attribute
     {
     }

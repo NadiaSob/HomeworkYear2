@@ -1,5 +1,4 @@
 ﻿using MyNUnit.Attributes;
-using System;
 using System.Collections.Concurrent;
 
 namespace TestProject.Tests
