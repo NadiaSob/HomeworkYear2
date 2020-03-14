@@ -163,7 +163,11 @@ namespace MyNUnit.Tests
         {
             var testArray = new int[3] { 1, 2, 3 };
 
-            CollectionAssert.AreEqual(testArray, BeforeAndAfterClassTests.TestArray);
+            Assert.AreEqual(testArray.Length, BeforeAndAfterClassTests.TestArray.Length);
+            for (var i = 0; i < 3; ++i)
+            {
+                Assert.AreEqual(testArray[i], BeforeAndAfterClassTests.TestArray[i]);
+            }
             Assert.AreEqual(4, BeforeAndAfterClassTests.Count);
         }
 
@@ -172,7 +176,11 @@ namespace MyNUnit.Tests
         {
             var testArray = new int[3] { 1, 2, 3 };
 
-            CollectionAssert.AreEqual(testArray, BeforeAndAfterTests.TestArray);
+            Assert.AreEqual(testArray.Length, BeforeAndAfterTests.TestArray.Length);
+            for (var i = 0; i < 3; ++i)
+            {
+                Assert.AreEqual(testArray[i], BeforeAndAfterTests.TestArray[i]);
+            }
             Assert.AreEqual(6, BeforeAndAfterTests.Count);
         }
 
