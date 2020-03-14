@@ -161,6 +161,9 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void BeforeAndAfterClassMethodsTest()
         {
+            myNUnit = new MyNUnit();
+            myNUnit.RunTests("..\\..\\..\\TestProject.Tests\\bin");
+
             var testArray = new int[3] { 1, 2, 3 };
 
             Assert.AreEqual(testArray.Length, BeforeAndAfterClassTests.TestArray.Length);
@@ -174,6 +177,9 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void BeforeAndAfterMethodsTest()
         {
+            myNUnit = new MyNUnit();
+            myNUnit.RunTests("..\\..\\..\\TestProject.Tests\\bin");
+
             var testArray = new int[3] { 1, 2, 3 };
 
             Assert.AreEqual(testArray.Length, BeforeAndAfterTests.TestArray.Length);
