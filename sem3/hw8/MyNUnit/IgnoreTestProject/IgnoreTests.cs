@@ -1,7 +1,7 @@
-﻿using System;
-using MyNUnit.Attributes;
+﻿using MyNUnit.Attributes;
+using System;
 
-namespace TestProject.Tests
+namespace IgnoreTestProject
 {
     public class IgnoreTests
     {

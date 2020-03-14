@@ -97,6 +97,7 @@ namespace MyNUnit
             {
                 Parallel.ForEach(beforeClassMethods, method =>
                 {
+                    CheckMethodToBeCorrect(method);
                     if (!method.IsStatic)
                     {
                         throw new InvalidOperationException("BeforeClass method must be static");
@@ -107,13 +108,18 @@ namespace MyNUnit
 
             if (testMethods.Count() != 0)
             {
-                Parallel.ForEach(testMethods, test => RunTest(test, instance, beforeMethods, afterMethods));
+                Parallel.ForEach(testMethods, test =>
+                {
+                    CheckMethodToBeCorrect(test);
+                    RunTest(test, instance, beforeMethods, afterMethods);
+                });
             }
 
             if (afterClassMethods.Count() != 0)
             {
                 Parallel.ForEach(afterClassMethods, method =>
                 {
+                    CheckMethodToBeCorrect(method);
                     if (!method.IsStatic)
                     {
                         throw new InvalidOperationException("AfterClass method must be static");
@@ -127,7 +133,11 @@ namespace MyNUnit
         {
             if (beforeMethods.Count() != 0)
             {
-                Parallel.ForEach(beforeMethods, method => RunMethod(method, instance));
+                Parallel.ForEach(beforeMethods, method =>
+                {
+                    CheckMethodToBeCorrect(method);
+                    RunMethod(method, instance);
+                });
             }
 
             var attribute = test.GetCustomAttribute<TestAttribute>();
@@ -181,7 +191,11 @@ namespace MyNUnit
 
                 if (afterMethods.Count() != 0)
                 {
-                    Parallel.ForEach(afterMethods, method => RunMethod(method, instance));
+                    Parallel.ForEach(afterMethods, method =>
+                    {
+                        CheckMethodToBeCorrect(method);
+                        RunMethod(method, instance);
+                    });
                 }
             }
         }
@@ -234,6 +248,19 @@ namespace MyNUnit
                 {
                     Console.WriteLine("Some tests have failed!");
                 }
+            }
+        }
+        
+        private void CheckMethodToBeCorrect(MethodInfo method)
+        {
+            if (method.ReturnType != typeof(void))
+            {
+                throw new InvalidOperationException($"Method {method.Name} must not return value");
+            }
+
+            if (method.GetParameters().Length != 0)
+            {
+                throw new InvalidOperationException($"Method {method.Name} must not have any input parameters");
             }
         }
     }

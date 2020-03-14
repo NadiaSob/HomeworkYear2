@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using BeforeAndAfterClassTestProject;
+using BeforeAndAfterTestProject;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestProject.Tests;
 
 namespace MyNUnit.Tests
 {
@@ -13,16 +14,13 @@ namespace MyNUnit.Tests
         public void Initialize()
         {
             myNUnit = new MyNUnit();
-            myNUnit.RunTests("..\\..\\..\\TestProject.Tests\\bin");
             testInfo = myNUnit.TestsInfo;
         }
 
         [TestMethod]
-        public void TestsCountTest() => Assert.AreEqual(16, testInfo.Count());
-
-        [TestMethod]
         public void PassedTestsTest()
         {
+            myNUnit.RunTests("..\\..\\..\\PassedTestProject\\bin");
             var passedTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)
@@ -61,6 +59,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void TimeTest()
         {
+            myNUnit.RunTests("..\\..\\..\\PassedTestProject\\bin");
             TestInfo timeTest = null;
 
             foreach (var info in testInfo)
@@ -79,6 +78,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void FailedTestsTest()
         {
+            myNUnit.RunTests("..\\..\\..\\FailedTestProject\\bin");
             var failedTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)
@@ -117,6 +117,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void ExceptionTestsTest()
         {
+            myNUnit.RunTests("..\\..\\..\\ExceptionTestProject\\bin");
             var exceptionTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)
@@ -161,15 +162,12 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void BeforeAndAfterClassMethodsTest()
         {
-            myNUnit = new MyNUnit();
-            myNUnit.RunTests("..\\..\\..\\TestProject.Tests\\bin");
+            BeforeAndAfterClassTests.TestArray = new int[] { 0, 0, 0 };
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\bin");
 
-            var testArray = new int[3] { 1, 2, 3 };
-
-            Assert.AreEqual(testArray.Length, BeforeAndAfterClassTests.TestArray.Length);
             for (var i = 0; i < 3; ++i)
             {
-                Assert.AreEqual(testArray[i], BeforeAndAfterClassTests.TestArray[i]);
+                Assert.AreEqual(i + 1, BeforeAndAfterClassTests.TestArray[i]);
             }
             Assert.AreEqual(4, BeforeAndAfterClassTests.Count);
         }
@@ -177,15 +175,12 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void BeforeAndAfterMethodsTest()
         {
-            myNUnit = new MyNUnit();
-            myNUnit.RunTests("..\\..\\..\\TestProject.Tests\\bin");
+            BeforeAndAfterTests.TestArray = new int[] { 0, 0, 0 };
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterTestProject\\bin");
 
-            var testArray = new int[3] { 1, 2, 3 };
-
-            Assert.AreEqual(testArray.Length, BeforeAndAfterTests.TestArray.Length);
             for (var i = 0; i < 3; ++i)
             {
-                Assert.AreEqual(testArray[i], BeforeAndAfterTests.TestArray[i]);
+                Assert.AreEqual(i + 1, BeforeAndAfterTests.TestArray[i]);
             }
             Assert.AreEqual(6, BeforeAndAfterTests.Count);
         }
@@ -193,6 +188,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void IgnoreTest()
         {
+            myNUnit.RunTests("..\\..\\..\\IgnoreTestProject\\bin");
             var ignoreTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)

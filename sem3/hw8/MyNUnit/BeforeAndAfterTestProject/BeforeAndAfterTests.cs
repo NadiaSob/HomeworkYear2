@@ -1,11 +1,10 @@
 ﻿using MyNUnit.Attributes;
-using System.Collections.Concurrent;
 
-namespace TestProject.Tests
+namespace BeforeAndAfterTestProject
 {
-    public class BeforeAndAfterClassTests
+    public class BeforeAndAfterTests
     {
-        public static int[] TestArray { get; private set; }
+        public static int[] TestArray { get; set; }
         public static int Count { get; set; }
         private static readonly object lockObject = new object();
 
@@ -14,14 +13,22 @@ namespace TestProject.Tests
         {
             lock (lockObject)
             {
-                TestArray = new int[3];
+                Count = 0;
+            }
+        }
+
+        [Before]
+        public static void BeforeMethod()
+        {
+            lock (lockObject)
+            {
                 TestArray[0] = 1;
-                Count = 1;
+                ++Count;
             }
         }
 
         [Test]
-        public void BeforeAndAfterClassTest1()
+        public void BeforeAndAfterTest1()
         {
             lock (lockObject)
             {
@@ -31,7 +38,7 @@ namespace TestProject.Tests
         }
 
         [Test]
-        public void BeforeAndAfterClassTest2()
+        public void BeforeAndAfterTest2()
         {
             lock (lockObject)
             {
@@ -39,8 +46,8 @@ namespace TestProject.Tests
             }
         }
 
-        [AfterClass]
-        public static void AfterClassMethod()
+        [After]
+        public void AfterMethod()
         {
             lock (lockObject)
             {

@@ -56,13 +56,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BeforeAndAfterClassTestProject\BeforeAndAfterClassTestProject.csproj">
+      <Project>{29420a0d-90c0-47e9-85e3-97dc6510d6c9}</Project>
+      <Name>BeforeAndAfterClassTestProject</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeforeAndAfterTestProject\BeforeAndAfterTestProject.csproj">
+      <Project>{a34c8c14-bf45-46e6-bc9d-03520f7021fd}</Project>
+      <Name>BeforeAndAfterTestProject</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MyNUnit\MyNUnit.csproj">
       <Project>{1f70e529-4366-470f-b396-b9e08a9a7e7b}</Project>
       <Name>MyNUnit</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TestProject.Tests\TestProject.Tests.csproj">
-      <Project>{7F444C43-F514-4DDD-87B3-AD0A98517042}</Project>
-      <Name>TestProject.Tests</Name>
+    <ProjectReference Include="..\PassedTestProject\PassedTestProject.csproj">
+      <Project>{ef1eaed7-4f35-4ece-a94f-708879598af2}</Project>
+      <Name>PassedTestProject</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
