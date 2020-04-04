@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Compile Include="EvenNumbersCount.fs" />
-    <Compile Include="Program.fs" />
   </ItemGroup>
 
 </Project>
