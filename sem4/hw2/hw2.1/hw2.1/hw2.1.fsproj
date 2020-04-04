@@ -10,4 +10,8 @@
     <Compile Include="EvenNumbersCount.fs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.7.1" />
+  </ItemGroup>
+
 </Project>
