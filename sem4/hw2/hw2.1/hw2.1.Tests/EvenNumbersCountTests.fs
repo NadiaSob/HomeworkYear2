@@ -21,21 +21,21 @@ let testCases () =
 
 [<TestCaseSource("testCases")>]
 [<Test>]
-let EvenNumbersCountMapTest list res =
+let evenNumbersCountMapTest list res =
     evenNumbersCountMap(list) |> should equal res
 
 [<TestCaseSource("testCases")>]
 [<Test>]
-let EvenNumbersCountFilterTest list res =
+let evenNumbersCountFilterTest list res =
     evenNumbersCountFilter(list) |> should equal res
 
 [<TestCaseSource("testCases")>]
 [<Test>]
-let EvenNumbersCountFoldTest list res =
+let evenNumbersCountFoldTest list res =
     evenNumbersCountFold(list) |> should equal res
 
-let FunctionsEquals (list:list<int>) = 
+let functionsEquals (list:list<int>) = 
     evenNumbersCountMap list = evenNumbersCountFilter list && evenNumbersCountFilter list = evenNumbersCountFold list
 
 [<Test>]
-Check.QuickThrowOnFailure FunctionsEquals
+Check.QuickThrowOnFailure functionsEquals
