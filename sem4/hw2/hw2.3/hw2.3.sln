@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "hw2.3", "hw2.3\hw2.3.fsproj", "{4566AA78-A6F5-466C-A98E-7E7DE4CB618C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "hw2.3.Tests", "hw2.3.Tests\hw2.3.Tests.fsproj", "{B0874F02-BC67-4234-91D9-38E6AD19CF25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{4566AA78-A6F5-466C-A98E-7E7DE4CB618C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4566AA78-A6F5-466C-A98E-7E7DE4CB618C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4566AA78-A6F5-466C-A98E-7E7DE4CB618C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0874F02-BC67-4234-91D9-38E6AD19CF25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0874F02-BC67-4234-91D9-38E6AD19CF25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0874F02-BC67-4234-91D9-38E6AD19CF25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0874F02-BC67-4234-91D9-38E6AD19CF25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
