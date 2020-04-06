@@ -1,7 +1,7 @@
-image: Visual Studio 2017
+image: Visual Studio 2019
 
 before_build:
-  - nuget restore sem3/hw5/SimpleFTP/SimpleFTP.sln
+  - nuget restore sem4/hw2/hw2.3/hw2.3.sln
 
 build:
-  project: sem3/hw5/SimpleFTP/SimpleFTP.sln
+  project: sem4/hw2/hw2.3/hw2.3.sln
