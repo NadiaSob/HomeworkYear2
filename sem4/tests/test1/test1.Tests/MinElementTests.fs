@@ -23,5 +23,5 @@ let findMinTest list res =
     findMin(list) |> should equal res
 
 [<Test>]
-let emptyListTest =
-    findMin([]) |> should throw typeof<InvalidOperationException>
+let emptyListTest () =
+    (fun () -> findMin([]) |> ignore) |> should throw typeof<InvalidOperationException>
