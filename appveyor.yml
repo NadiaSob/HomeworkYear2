@@ -1,7 +1,7 @@
 image: Visual Studio 2017
 
 before_build:
-  - nuget restore sem3/hw5/SimpleFTP/SimpleFTP.sln
+  - nuget restore sem3/hw3/MyThreadPool/MyThreadPool.sln
 
 build:
-  project: sem3/hw5/SimpleFTP/SimpleFTP.sln
+  project: sem3/hw3/MyThreadPool/MyThreadPool.sln
