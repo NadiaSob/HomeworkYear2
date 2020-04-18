@@ -64,14 +64,13 @@ namespace MyThreadPool.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void IncorrectNumberOfThreadsTest()
         {
-            new MyThreadPool(0);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new MyThreadPool(0));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new MyThreadPool(-3));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void ShutDownTest()
         {
             var pool = new MyThreadPool(5);
@@ -94,7 +93,7 @@ namespace MyThreadPool.Tests
                 Assert.IsTrue(task.IsCompleted);
             }
 
-            pool.AddTask(() => 31 + 30);
+            Assert.ThrowsException<InvalidOperationException>(() => pool.AddTask(() => 31 + 30));
         }
 
         [TestMethod]
@@ -124,6 +123,132 @@ namespace MyThreadPool.Tests
 
             Assert.AreEqual(1, newTask2.Result);
             Assert.IsTrue(newTask2.IsCompleted);
+        }
+
+        [TestMethod]
+        public void ThreadSafetyTest()
+        {
+            var pool = new MyThreadPool(3);
+            var threads = new Thread[4];
+            var tasks = new IMyTask<int>[4];
+
+            for (var i = 0; i < 4; ++i)
+            {
+                var localI = i;
+                threads[i] = new Thread(() =>
+                {
+                    tasks[localI] = pool.AddTask(() => (localI + 1) * 3);
+                });
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Start();
+            }
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+
+            for (var i = 0; i < 4; ++i)
+            {
+                Assert.AreEqual((i + 1) * 3, tasks[i].Result);
+                Assert.IsTrue(tasks[i].IsCompleted);
+            }
+        }
+
+        [TestMethod]
+        public void ThreadSafetyShutDownTest()
+        {
+            var pool = new MyThreadPool(4);
+            var threads = new Thread[7];
+            var tasks = new IMyTask<int>[7];
+            var manualResetEvent = new ManualResetEvent(false);
+
+            for (var i = 0; i < 7; ++i)
+            {
+                var localI = i;
+                threads[i] = new Thread(() =>
+                {
+                    tasks[localI] = pool.AddTask(() =>
+                    {
+                        manualResetEvent.WaitOne();
+                        Thread.Sleep(50);
+                        return localI + 10; 
+                    });
+                });
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Start();
+            }
+
+            Thread.Sleep(500);
+            manualResetEvent.Set();
+            pool.Shutdown();
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+
+            for (var i = 0; i < 7; ++i)
+            {
+                Assert.AreEqual(i + 10, tasks[i].Result);
+                Assert.IsTrue(tasks[i].IsCompleted);
+            }
+
+            Assert.ThrowsException<InvalidOperationException>(() => pool.AddTask(() => 10 + 10));
+        }
+
+        [TestMethod]
+        public void ThreadSafetyContinueWithTest()
+        {
+            var pool = new MyThreadPool(3);
+            var threads = new Thread[5];
+            var tasks = new IMyTask<int>[5];
+            var manualResetEvent = new ManualResetEvent(false);
+            threads[0] = new Thread(() => tasks[0] = pool.AddTask(() => 10));
+
+            for (var i = 1; i < 5; ++i)
+            {
+                var localI = i;
+                threads[i] = new Thread(() =>
+                {
+                    tasks[localI] = tasks[localI - 1].ContinueWith((result) =>
+                    {
+                        manualResetEvent.WaitOne();
+                        return result + localI;
+                    });
+                });
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Start();
+                Thread.Sleep(60);
+            }
+
+            Thread.Sleep(500);
+            manualResetEvent.Set();
+            pool.Shutdown();
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+
+            var temp = 10;
+            for (var i = 0; i < 5; ++i)
+            {
+                Assert.AreEqual(temp + i, tasks[i].Result);
+                Assert.IsTrue(tasks[i].IsCompleted);
+                temp += i;
+            }
+
+            Assert.ThrowsException<InvalidOperationException>(
+                () => tasks[4].ContinueWith((result) => result + 1));
         }
     }
 }

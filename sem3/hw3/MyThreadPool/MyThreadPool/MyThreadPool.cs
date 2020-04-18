@@ -12,13 +12,19 @@ namespace MyThreadPool
     {
         public int NumberOfThreads { get; private set; }
 
-        private ConcurrentQueue<Action> taskQueue;
+        private int numberOfWorkingThreads = 0;
 
-        private CancellationTokenSource cancellationToken;
+        private ConcurrentQueue<Action> taskQueue = new ConcurrentQueue<Action>();
+
+        private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private Thread[] threads;
 
-        private AutoResetEvent newTaskAvailable;
+        private AutoResetEvent newTaskAvailable = new AutoResetEvent(false);
+
+        private AutoResetEvent threadStopped = new AutoResetEvent(false);
+
+        private object lockObject = new object();
 
         public MyThreadPool(int numberOfThreads)
         {
@@ -27,9 +33,6 @@ namespace MyThreadPool
                 throw new ArgumentOutOfRangeException("Number of threads should be a positive number.");
             }
 
-            taskQueue = new ConcurrentQueue<Action>();
-            cancellationToken = new CancellationTokenSource();
-            newTaskAvailable = new AutoResetEvent(false);
             NumberOfThreads = numberOfThreads;
             CreateThreads(numberOfThreads);
         }
@@ -46,6 +49,8 @@ namespace MyThreadPool
                     {
                         if (cancellationToken.Token.IsCancellationRequested && taskQueue.IsEmpty)
                         {
+                            Interlocked.Decrement(ref numberOfWorkingThreads);
+                            threadStopped.Set();
                             return;
                         }
 
@@ -60,6 +65,8 @@ namespace MyThreadPool
                     }
                 });
                 threads[i].Start();
+
+                Interlocked.Increment(ref numberOfWorkingThreads);
             }
         }
 
@@ -71,15 +78,18 @@ namespace MyThreadPool
         /// <returns>Queued task.</returns>
         public IMyTask<TResult> AddTask<TResult>(Func<TResult> supplier)
         {
-            if (cancellationToken.Token.IsCancellationRequested)
+            var myTask = new MyTask<TResult>(supplier, this);
+
+            if (!cancellationToken.Token.IsCancellationRequested)
             {
-                throw new InvalidOperationException("Thread pool has been closed.");
+                if (numberOfWorkingThreads != 0)
+                {
+                    EnqueueTask(myTask.Calculate);
+                    return myTask;
+                }
             }
 
-            var myTask = new MyTask<TResult>(supplier, this);
-            EnqueueTask(myTask.Calculate);
-
-            return myTask;
+            throw new InvalidOperationException("Thread pool has been closed.");
         }
 
         private void EnqueueTask(Action task)
@@ -94,6 +104,13 @@ namespace MyThreadPool
         public void Shutdown()
         {
             cancellationToken.Cancel();
+
+            while (numberOfWorkingThreads != 0)
+            {
+                newTaskAvailable.Set();
+
+                threadStopped.WaitOne();
+            }
         }
 
         private class MyTask<TResult> : IMyTask<TResult>
@@ -131,19 +148,17 @@ namespace MyThreadPool
 
             private AggregateException aggregateException;
 
-            private ManualResetEvent isCompletedEvent;
+            private ManualResetEvent isCompletedEvent = new ManualResetEvent(false);
 
             private MyThreadPool myThreadPool;
 
-            private Queue<Action> localTaskQueue;
+            private Queue<Action> localTaskQueue = new Queue<Action>();
 
             private object queueLockObject = new object();
 
             public MyTask(Func<TResult> supplier, MyThreadPool myThreadPool)
             {
-                localTaskQueue = new Queue<Action>();
                 this.supplier = supplier;
-                isCompletedEvent = new ManualResetEvent(false);
                 this.myThreadPool = myThreadPool;
             }
 
@@ -163,11 +178,12 @@ namespace MyThreadPool
                 finally
                 {
                     supplier = null;
-                    IsCompleted = true;
-                    isCompletedEvent.Set();
 
                     lock (queueLockObject)
                     {
+                        IsCompleted = true;
+                        isCompletedEvent.Set();
+
                         while (localTaskQueue.Count != 0)
                         {
                             myThreadPool.EnqueueTask(localTaskQueue.Dequeue());
@@ -184,6 +200,11 @@ namespace MyThreadPool
             /// <returns>New task which is applied to the result of this task.</returns>
             public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> newSupplier)
             {
+                if (myThreadPool.cancellationToken.Token.IsCancellationRequested)
+                {
+                    throw new InvalidOperationException("Thread pool has been closed.");
+                }
+
                 var newTask = new MyTask<TNewResult>(() => newSupplier(Result), myThreadPool);
 
                 lock (queueLockObject)
@@ -191,10 +212,14 @@ namespace MyThreadPool
                     if (!IsCompleted)
                     {
                         localTaskQueue.Enqueue(newTask.Calculate);
-                        return newTask;
                     }
+                    else
+                    {
+                        myThreadPool.EnqueueTask(newTask.Calculate);
+                    }
+
+                    return newTask;
                 }
-                return myThreadPool.AddTask(() => newSupplier(Result));
             }
         }
     }
