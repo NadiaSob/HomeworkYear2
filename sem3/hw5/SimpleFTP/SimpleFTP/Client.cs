@@ -2,13 +2,14 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SimpleFTP
 {
     /// <summary>
     /// Class implementing FTP client.
     /// </summary>
-    public class Client
+    public class Client : IDisposable
     {
         private static TcpClient client;
 
@@ -57,7 +58,7 @@ namespace SimpleFTP
         /// <param name="path">Path to the directory on the server to list all files and directories in.</param>
         /// <returns>String "size (name isDir)* " where "size" is a number of files and folders in the directory,
         /// "name" is a name of a file or a folder and "isDir" is bool value indicating whether it is directory."</returns>
-        public async Task<string> List(string path)
+        public async Task<List<(string, bool)>> List(string path)
         {
             var response = await MakeRequest(1, path);
 
@@ -67,8 +68,25 @@ namespace SimpleFTP
             }
             else
             {
-                return response;
+                return HandleListResponse(response);
             }
+        }
+
+        private List<(string, bool)> HandleListResponse(string response)
+        {
+            var splitResponse = response.Split(' ');
+
+            var length = int.Parse(splitResponse[0]);
+
+            var result = new List<(string, bool)>();
+            for (var i = 1; i < length * 2; i += 2)
+            {
+                var name = splitResponse[i];
+                var isDirectory = bool.Parse(splitResponse[i + 1]);
+                result.Add((name, isDirectory));
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -111,6 +129,16 @@ namespace SimpleFTP
             writer?.Close();
             reader?.Close();
             client?.Close();
+        }
+
+        /// <summary>
+        /// Disposes writer, reader and client.
+        /// </summary>
+        public void Dispose()
+        {
+            writer?.Dispose();
+            reader?.Dispose();
+            client?.Dispose();
         }
     }
 }

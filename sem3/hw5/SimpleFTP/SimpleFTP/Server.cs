@@ -13,8 +13,6 @@ namespace SimpleFTP
     {
         private readonly TcpListener listener;
 
-        private TcpClient client;
-
         private readonly CancellationTokenSource cancellationToken;
 
         public Server(int port)
@@ -34,8 +32,8 @@ namespace SimpleFTP
                 
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    client = await listener.AcceptTcpClientAsync();
-                    ClientService();
+                    var client = await listener.AcceptTcpClientAsync();
+                    ClientService(client);
                 }
             }
             finally
@@ -44,7 +42,7 @@ namespace SimpleFTP
             }
         }
 
-        private void ClientService()
+        private void ClientService(TcpClient client)
         {
             Task.Run(async () =>
             {

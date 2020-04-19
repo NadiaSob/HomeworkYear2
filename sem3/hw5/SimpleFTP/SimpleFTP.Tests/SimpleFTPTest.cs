@@ -14,10 +14,7 @@ namespace SimpleFTP.Tests
         {
             server = new Server(1234);
             client = new Client("localhost", 1234);
-        }
 
-        private void Start()
-        {
             server.Start();
             client.Connect();
         }
@@ -26,23 +23,24 @@ namespace SimpleFTP.Tests
         {
             server.Stop();
             client.Stop();
+            client.Dispose();
         }
 
         [TestMethod]
         public async Task ListTest()
         {
-            Start();
             var response = await client.List(path);
-            var expected = "3 .\\testfile.txt false .\\TestDirectory1 true .\\TestDirectory2 true ";
-            Assert.AreEqual(expected, response);
+            Assert.AreEqual(3, response.Count);
+            Assert.IsTrue(response.Contains((".\\testfile.txt", false)));
+            Assert.IsTrue(response.Contains((".\\TestDirectory1", true)));
+            Assert.IsTrue(response.Contains((".\\TestDirectory2", true)));
             Stop();
         }
 
         [TestMethod]
         [ExpectedException(typeof(DirectoryNotFoundException))]
-        public async Task DirectoryDoNotExistListTest()
+        public async Task DirectoryDoesNotExistListTest()
         {
-            Start();
             _ = await client.List(path + "\\NonexistentDirectory");
             Stop();
         }
@@ -50,7 +48,6 @@ namespace SimpleFTP.Tests
         [TestMethod]
         public async Task GetTest()
         {
-            Start();
             var response = await client.Get(filePath);
             var file = File.ReadAllBytes(filePath);
             var expected = $"{file.Length} {file}";
@@ -60,9 +57,8 @@ namespace SimpleFTP.Tests
 
         [TestMethod]
         [ExpectedException(typeof(FileNotFoundException))]
-        public async Task FileDoNotExistListTest()
+        public async Task FileDoesNotExistGetTest()
         {
-            Start();
             _ = await client.Get(path + "\\NonexistentFile.txt");
             Stop();
         }
