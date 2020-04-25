@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUIForFTP"
         mc:Ignorable="d"
-        Title="SimpleFTP" Height="435" Width="640" MinHeight="435" MinWidth="640">
+        Title="SimpleFTP" Height="435" Width="640" MinHeight="435" MinWidth="640" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style TargetType="Label">
@@ -52,7 +52,7 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
-                    <Label Content="Current folder" FontSize="15" Margin="15,0,0,0"/>
+                    <Label Content="Current folder on server" FontSize="15" Margin="15,0,0,0"/>
                 </Grid>
 
                 <Grid Grid.Row="1">
@@ -75,7 +75,8 @@
                             <Button Content=".." Margin="2" FontSize="15"/>
                         </Grid>
                         <Grid Grid.Column="1">
-                            <Button Content="Choose folder" Margin="2" FontSize="15"/>
+                            <Label Content="Path:" FontSize="15" FontWeight="Normal" HorizontalAlignment="Left"/>
+                            <Label Content="{Binding Path=ServerPath}" FontSize="15" FontWeight="Normal" HorizontalAlignment="Left" Margin="43,0,0,0"/>
                         </Grid>
                     </Grid>
                 </Grid>
@@ -88,7 +89,9 @@
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0">
-                    <ListBox x:Name="currentFolderList" Margin="2,0,0,2"/>
+                    <ListBox Margin="2,0,0,2" ItemsSource="{Binding ServerFolderList}">
+                        
+                    </ListBox>
                 </ScrollViewer>
 
                 <Grid Grid.Row="1">
@@ -182,20 +185,20 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0" Grid.Row="0">
-                    <Label Content="Address" FontSize="20" />
+                    <Label Content="Hostname" FontSize="20" />
                 </Grid>
                 <Grid Grid.Column="1" Grid.Row="0">
                     <Label Content="Port" FontSize="20" />
                 </Grid>
                 <Grid Grid.Column="0" Grid.Row="1">
-                    <TextBox  x:Name="addressTextBox" Text="{Binding Path=Address}" Margin="2"/>
+                    <TextBox Text="{Binding Path=Hostname}" Margin="2"/>
                 </Grid>
                 <Grid Grid.Column="1" Grid.Row="1">
-                    <TextBox  x:Name="portTextBox" Text="{Binding Path=Port}" Margin="2"/>
+                    <TextBox Text="{Binding Path=Port}" Margin="2"/>
                 </Grid>
             </Grid>
             <Grid Grid.Row="1">
-                <Button x:Name="connectButton" Content="CONNECT" Margin="90,1,90,5" FontSize="20"/>
+                <Button Command="{Binding Connect}" Content="CONNECT" Margin="90,1,90,5" FontSize="20"/>
             </Grid>
         </Grid>
 

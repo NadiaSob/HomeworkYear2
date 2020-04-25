@@ -46,20 +46,23 @@ namespace SimpleFTP
         {
             Task.Run(async () =>
             {
-                var reader = new StreamReader(client.GetStream());
+                //var reader = new StreamReader(client.GetStream());
                 var writer = new StreamWriter(client.GetStream()) { AutoFlush = true };
 
-                while (!cancellationToken.IsCancellationRequested)
+                using (var reader = new StreamReader(client.GetStream()))
                 {
-                    var request = (await reader.ReadLineAsync()).Split(' ');
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        var request = (await reader.ReadLineAsync()).Split(' ');
 
-                    if (request[0] == "1")
-                    {
-                        await ListResponse(request[1], writer);
-                    }
-                    else if (request[0] == "2")
-                    {
-                        await GetResponse(request[1], writer);
+                        if (request[0] == "1")
+                        {
+                            await ListResponse(request[1], writer);
+                        }
+                        else if (request[0] == "2")
+                        {
+                            await GetResponse(request[1], writer);
+                        }
                     }
                 }
             });

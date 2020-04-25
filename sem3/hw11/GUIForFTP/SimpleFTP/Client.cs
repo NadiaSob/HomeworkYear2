@@ -47,8 +47,8 @@ namespace SimpleFTP
             }
             catch (SocketException exception)
             {
-                Console.WriteLine(exception.Message);
                 IsConnected = false;
+                throw exception;
             }
         }
 
