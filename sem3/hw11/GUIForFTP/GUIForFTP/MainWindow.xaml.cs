@@ -28,5 +28,11 @@ namespace GUIForFTP
             DataContext = viewModel;
             InitializeComponent();
         }
+
+        private async void HandleServerDoubleClick(object sender, RoutedEventArgs e) =>
+            await viewModel.OpenOrDownloadServerItem((sender as ListBoxItem).Content.ToString());
+
+        private void HandleClientDoubleClick(object sender, RoutedEventArgs e) =>
+            viewModel.OpenClientFolder((sender as ListBoxItem).Content.ToString());
     }
 }

@@ -46,15 +46,13 @@ namespace SimpleFTP
         {
             Task.Run(async () =>
             {
-                //var reader = new StreamReader(client.GetStream());
-                var writer = new StreamWriter(client.GetStream()) { AutoFlush = true };
-
+                using (var writer = new StreamWriter(client.GetStream()) { AutoFlush = true })
                 using (var reader = new StreamReader(client.GetStream()))
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         var request = (await reader.ReadLineAsync()).Split(' ');
-
+                        
                         if (request[0] == "1")
                         {
                             await ListResponse(request[1], writer);
@@ -81,17 +79,18 @@ namespace SimpleFTP
 
             var response = $"{files.Length + directories.Length} ";
 
-            foreach (var file in files)
-            {
-                var fileName = file.Replace(path, ""); 
-                response += $".{fileName} false ";
-            }
-
             foreach (var directory in directories)
             {
                 var directoryName = directory.Replace(path, "");
                 response += $".{directoryName} true ";
             }
+
+            foreach (var file in files)
+            {
+                var fileName = file.Replace(path, ""); 
+                response += $".{fileName} false ";
+            }
+            
             await writer.WriteLineAsync(response);
         }
 

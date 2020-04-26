@@ -62,7 +62,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <Button Content="?" Margin="2" FontSize="15"/>
+                        <Button Command ="{Binding Help}" Content="?" Margin="2" FontSize="15"/>
                     </Grid>
 
                     <Grid Grid.Column="1">
@@ -72,7 +72,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Column="0">
-                            <Button Content=".." Margin="2" FontSize="15"/>
+                            <Button Command ="{Binding GoServerFolderUp}" Content=".." Margin="2" FontSize="15"/>
                         </Grid>
                         <Grid Grid.Column="1">
                             <Label Content="Path:" FontSize="15" FontWeight="Normal" HorizontalAlignment="Left"/>
@@ -89,8 +89,12 @@
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0">
-                    <ListBox Margin="2,0,0,2" ItemsSource="{Binding ServerFolderList}">
-                        
+                    <ListBox Margin="2,0,0,2" ItemsSource="{Binding DisplayedServerFolderList}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <EventSetter Event="MouseDoubleClick" Handler="HandleServerDoubleClick"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
                     </ListBox>
                 </ScrollViewer>
 
@@ -136,7 +140,7 @@
                         <Button Content=".." Margin="2" FontSize="15"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <Button Content="Choose folder" Margin="2" FontSize="15"/>
+                        <Button Command="{Binding ChooseDownloadFolder}" Content="{Binding Path=ClientPath}" Margin="2" FontSize="15"/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -148,7 +152,13 @@
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0">
-                    <ListBox x:Name="downloadsFolderList" Margin="2,0,0,0"/>
+                    <ListBox Margin="2,0,0,0" ItemsSource="{Binding DisplayedClientFolderList}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <EventSetter Event="MouseDoubleClick" Handler="HandleClientDoubleClick"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
                 </ScrollViewer>
 
                 <Grid Grid.Row="1">
@@ -158,10 +168,10 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <Label Content="In process" FontSize="14" />
+                        <Label Content="In process" FontSize="14"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <Label Content="Downloaded" FontSize="14" />
+                        <Label Content="Downloaded" FontSize="14"/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -209,11 +219,11 @@
             </Grid.ColumnDefinitions>
 
             <ScrollViewer Grid.Column="0"/>
-                <ListBox x:Name="inProcessList" Margin="2,0,0,0" />
+            <ListBox Margin="2,0,0,0"/>
             <ScrollViewer/>
             
             <ScrollViewer Grid.Column="1"/>
-                <ListBox x:Name="downloadedList" />
+            <ListBox BorderThickness="1,0,0,0"/>
             <ScrollViewer/>
         </Grid>
 
