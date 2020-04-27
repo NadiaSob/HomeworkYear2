@@ -23,10 +23,10 @@ namespace GUIForFTP
         private string clientPath;
         private Client client;
         private Server server;
-        private bool isConnected = false;
         private string serverRoot;
         private List<(string, bool)> serverFolderList = new List<(string, bool)>();
         private List<(string, bool)> clientFolderList = new List<(string, bool)>();
+        private string selectedItem;
 
         public ObservableCollection<string> DisplayedServerFolderList { get; private set; } 
             = new ObservableCollection<string>();
@@ -39,6 +39,24 @@ namespace GUIForFTP
 
         public ObservableCollection<string> DownloadedList { get; private set; } 
             = new ObservableCollection<string>();
+
+        public string SelectedItem
+        {
+            get
+                => selectedItem;
+            set
+            {
+                if (value != null)
+                {
+                    if (IsDirectory(value))
+                    {
+                        selectedItem = null;
+                        return;
+                    }
+                }
+                selectedItem = value;
+            }
+        }
 
         public string ServerPath
         {
@@ -137,7 +155,6 @@ namespace GUIForFTP
 
                         client = new Client(hostname, port);
                         client.Connect();
-                        isConnected = true;
                         await UpdateServerList(serverRoot);
                     }
                     catch (Exception exception)
@@ -145,7 +162,6 @@ namespace GUIForFTP
                         HandleError(exception.Message);
                         serverFolderList.Clear();
                         DisplayedServerFolderList.Clear();
-                        isConnected = false;
                     }
                 }, obj => hostname != "" && port != -1);
             }
@@ -214,21 +230,33 @@ namespace GUIForFTP
             }
         }
 
-        /*public ICommand DownloadFile
+        public ICommand Download
         {
             get
             {
                 return new Command(obj =>
                 {
-                    FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
-                    if (folderBrowser.ShowDialog() == DialogResult.OK)
+                }, obj => serverFolderList.Count != 0 && selectedItem != null);
+            }
+        }
+
+        public ICommand DownloadAll
+        {
+            get
+            {
+                return new Command(async obj =>
+                {
+                    foreach (var item in serverFolderList)
                     {
-                        ClientPath = folderBrowser.SelectedPath.Replace('\\', '/');
-                        UpdateClientList(clientPath);
+                        if (!item.Item2)
+                        {
+                            var name = item.Item1.Substring(item.Item1.LastIndexOf('\\') + 1);
+                            await DownloadFile(name);
+                        }
                     }
                 });
             }
-        }*/
+        }
 
         private void UpdateClientList(string path)
         {
@@ -341,7 +369,7 @@ namespace GUIForFTP
                     return;
                 }
 
-                var path = serverPath + "\\" + name;
+                var path = serverPath + "/" + name;
 
                 InProcessList.Add(name);
 
@@ -353,6 +381,7 @@ namespace GUIForFTP
             }
             catch (Exception exception)
             {
+                InProcessList.Remove(name);
                 HandleError(exception.Message);
             }
         }

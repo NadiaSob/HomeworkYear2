@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -102,7 +103,7 @@ namespace SimpleFTP
                 return;
             }
 
-            var content = File.ReadAllBytes(path);
+            var content = File.ReadAllText(path);
             var size = content.Length;
             await writer.WriteLineAsync($"{size} {content}");
         }

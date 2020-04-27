@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace GUIForFTP
 {
@@ -34,5 +23,9 @@ namespace GUIForFTP
 
         private void HandleClientDoubleClick(object sender, RoutedEventArgs e) =>
             viewModel.OpenClientFolder((sender as ListBoxItem).Content.ToString());
+
+        private async void DownloadButtonClick(object sender, RoutedEventArgs e) => await viewModel.DownloadFile(serverList.SelectedItem.ToString());
+
+        private void SelectedItemChanged(object sender, SelectionChangedEventArgs e) => viewModel.SelectedItem = serverList.SelectedItem?.ToString();
     }
 }

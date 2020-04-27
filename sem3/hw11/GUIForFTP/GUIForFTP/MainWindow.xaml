@@ -89,7 +89,7 @@
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0">
-                    <ListBox x:Name="serverList" Margin="2,0,0,2" ItemsSource="{Binding DisplayedServerFolderList}">
+                    <ListBox x:Name="serverList" Margin="2,0,0,2" ItemsSource="{Binding DisplayedServerFolderList}" SelectionChanged="SelectedItemChanged">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <EventSetter Event="MouseDoubleClick" Handler="HandleServerDoubleClick"/>
@@ -105,10 +105,10 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <Button Content="Download" Margin="2" FontSize="15"/>
+                        <Button Content="Download" Command="{Binding Download}" Margin="2" FontSize="15" Click="DownloadButtonClick"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <Button Content="Download all" Margin="2" FontSize="15"/>
+                        <Button Content="Download all" Command="{Binding DownloadAll}" Margin="2" FontSize="15"/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -218,14 +218,13 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <ScrollViewer Grid.Column="0"/>
-            <ListBox Margin="2,0,0,0" ItemsSource="{Binding DownloadedList}"/>
-            <ScrollViewer/>
-            
-            <ScrollViewer Grid.Column="1"/>
-            <ListBox BorderThickness="1,0,0,0" ItemsSource="{Binding InProcessList}"/>
-            <ScrollViewer/>
-        </Grid>
+            <ScrollViewer Grid.Column="0">
+                <ListBox Margin="2,0,0,0" ItemsSource="{Binding InProcessList}"/>
+            </ScrollViewer>
 
+            <ScrollViewer Grid.Column="1">
+                <ListBox ItemsSource="{Binding DownloadedList}"/>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Window>

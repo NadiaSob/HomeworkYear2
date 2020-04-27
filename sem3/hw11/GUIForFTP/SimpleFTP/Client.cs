@@ -97,6 +97,8 @@ namespace SimpleFTP
         public async Task Get(string filePath, string destination)
         {
             var response = await MakeRequest(2, filePath);
+            var splitResponse = response.Split(' ');
+            var content = response.Replace($"{splitResponse[0]} ", "");
 
             if (response == "-1")
             {
@@ -104,10 +106,10 @@ namespace SimpleFTP
             }
             else
             {
-                var fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
+                var fileName = filePath.Substring(filePath.LastIndexOf('/') + 1);
                 using (var fileWriter = new StreamWriter(new FileStream(destination + "\\" + fileName, FileMode.Create)))
                 {
-                    await fileWriter.WriteAsync(response);
+                    await fileWriter.WriteAsync(content);
                 }
             }
         }
