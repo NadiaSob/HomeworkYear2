@@ -90,13 +90,13 @@ namespace SimpleFTP
         }
 
         /// <summary>
-        /// Sends a request to get a file from server. 
+        /// Get a file from server to the destination directory. 
         /// </summary>
-        /// <param name="path">Path to the file to get.</param>
-        /// <returns>String "size content", where "size" is a size of the file and "content" is a file content.</returns>
-        public async Task<string> Get(string path)
+        /// <param name="filePath">Path to get file from.</param>
+        /// <param name="destination">Path to get file into.</param>
+        public async Task Get(string filePath, string destination)
         {
-            var response = await MakeRequest(2, path);
+            var response = await MakeRequest(2, filePath);
 
             if (response == "-1")
             {
@@ -104,7 +104,11 @@ namespace SimpleFTP
             }
             else
             {
-                return response;
+                var fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
+                using (var fileWriter = new StreamWriter(new FileStream(destination + "\\" + fileName, FileMode.Create)))
+                {
+                    await fileWriter.WriteAsync(response);
+                }
             }
         }
 

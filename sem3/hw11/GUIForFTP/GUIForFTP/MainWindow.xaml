@@ -89,7 +89,7 @@
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0">
-                    <ListBox Margin="2,0,0,2" ItemsSource="{Binding DisplayedServerFolderList}">
+                    <ListBox x:Name="serverList" Margin="2,0,0,2" ItemsSource="{Binding DisplayedServerFolderList}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <EventSetter Event="MouseDoubleClick" Handler="HandleServerDoubleClick"/>
@@ -219,11 +219,11 @@
             </Grid.ColumnDefinitions>
 
             <ScrollViewer Grid.Column="0"/>
-            <ListBox Margin="2,0,0,0"/>
+            <ListBox Margin="2,0,0,0" ItemsSource="{Binding DownloadedList}"/>
             <ScrollViewer/>
             
             <ScrollViewer Grid.Column="1"/>
-            <ListBox BorderThickness="1,0,0,0"/>
+            <ListBox BorderThickness="1,0,0,0" ItemsSource="{Binding InProcessList}"/>
             <ScrollViewer/>
         </Grid>
 

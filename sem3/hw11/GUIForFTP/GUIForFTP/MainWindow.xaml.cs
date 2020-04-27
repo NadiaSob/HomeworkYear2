@@ -20,7 +20,7 @@ namespace GUIForFTP
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ApplicationViewModel viewModel;
+        private readonly ApplicationViewModel viewModel;
 
         public MainWindow()
         {

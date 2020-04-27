@@ -37,7 +37,7 @@ namespace GUIForFTP
         public ObservableCollection<string> InProcessList { get; private set; } 
             = new ObservableCollection<string>();
 
-        public ObservableCollection<string> DownloadingList { get; private set; } 
+        public ObservableCollection<string> DownloadedList { get; private set; } 
             = new ObservableCollection<string>();
 
         public string ServerPath
@@ -109,10 +109,10 @@ namespace GUIForFTP
         public void NotifyPropertyChanged([CallerMemberName] string prop = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
 
-        private void HandleException(Exception exception)
+        private void HandleError(string message)
         {
-            System.Windows.MessageBox.Show("An exception just occurred: " + exception.Message,
-                "Exception", 
+            System.Windows.MessageBox.Show("An error just occurred: " + message,
+                "Error", 
                 MessageBoxButton.OK, 
                 MessageBoxImage.Error);
         }
@@ -142,7 +142,7 @@ namespace GUIForFTP
                     }
                     catch (Exception exception)
                     {
-                        HandleException(exception);
+                        HandleError(exception.Message);
                         serverFolderList.Clear();
                         DisplayedServerFolderList.Clear();
                         isConnected = false;
@@ -168,7 +168,14 @@ namespace GUIForFTP
             {
                 return new Command(obj =>
                 {
-                    UpdateClientList(clientPath.Substring(0, clientPath.LastIndexOf('/')));
+                    var newPath = clientPath.Substring(0, clientPath.LastIndexOf('/'));
+
+                    if (newPath.Length < 3 && !newPath.EndsWith("/"))
+                    {
+                        newPath += "/";
+                    }
+
+                    UpdateClientList(newPath);
                 }, obj => clientPath != "Choose folder" && clientPath.Length > 3);
             }
         }
@@ -207,6 +214,22 @@ namespace GUIForFTP
             }
         }
 
+        /*public ICommand DownloadFile
+        {
+            get
+            {
+                return new Command(obj =>
+                {
+                    FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
+                    if (folderBrowser.ShowDialog() == DialogResult.OK)
+                    {
+                        ClientPath = folderBrowser.SelectedPath.Replace('\\', '/');
+                        UpdateClientList(clientPath);
+                    }
+                });
+            }
+        }*/
+
         private void UpdateClientList(string path)
         {
             clientFolderList.Clear();
@@ -231,7 +254,7 @@ namespace GUIForFTP
             }
             catch (Exception exception)
             {
-                HandleException(exception);
+                HandleError(exception.Message);
             }
         }
 
@@ -304,7 +327,33 @@ namespace GUIForFTP
             }
             else
             {
-                //Скачиваем файл.
+                await DownloadFile(name);
+            }
+        }
+
+        public async Task DownloadFile(string name)
+        {
+            try
+            {
+                if (clientPath == "Choose folder")
+                {
+                    HandleError("Choose downloads folder to download files into.");
+                    return;
+                }
+
+                var path = serverPath + "\\" + name;
+
+                InProcessList.Add(name);
+
+                await client.Get(path, clientPath);
+
+                InProcessList.Remove(name);
+                DownloadedList.Add(name);
+                UpdateClientList(clientPath);
+            }
+            catch (Exception exception)
+            {
+                HandleError(exception.Message);
             }
         }
     }
