@@ -162,6 +162,17 @@ namespace GUIForFTP
             }
         }
 
+        public ICommand GoClientFolderUp
+        {
+            get
+            {
+                return new Command(obj =>
+                {
+                    UpdateClientList(clientPath.Substring(0, clientPath.LastIndexOf('/')));
+                }, obj => clientPath != "Choose folder" && clientPath.Length > 3);
+            }
+        }
+
         public ICommand Help
         {
             get
@@ -200,20 +211,28 @@ namespace GUIForFTP
         {
             clientFolderList.Clear();
 
-            var directories = Directory.GetDirectories(path);
-            var files = Directory.GetFiles(path);
-            
-            foreach (var directory in directories)
+            try
             {
-                clientFolderList.Add((directory, true));
-            }
+                var directories = Directory.GetDirectories(path);
+                var files = Directory.GetFiles(path);
 
-            foreach (var file in files)
+                foreach (var directory in directories)
+                {
+                    clientFolderList.Add((directory.Substring(directory.LastIndexOf('/') + 1), true));
+                }
+
+                foreach (var file in files)
+                {
+                    clientFolderList.Add((file.Substring(file.LastIndexOf('/') + 1), true));
+                }
+
+                UpdateDisplayedClientFolderList();
+                ClientPath = path;
+            }
+            catch (Exception exception)
             {
-                clientFolderList.Add((file, true));
+                HandleException(exception);
             }
-
-            UpdateDisplayedClientFolderList();
         }
 
         private void UpdateDisplayedClientFolderList()

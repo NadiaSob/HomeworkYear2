@@ -137,7 +137,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <Button Content=".." Margin="2" FontSize="15"/>
+                        <Button Command ="{Binding GoClientFolderUp}" Content=".." Margin="2" FontSize="15"/>
                     </Grid>
                     <Grid Grid.Column="1">
                         <Button Command="{Binding ChooseDownloadFolder}" Content="{Binding Path=ClientPath}" Margin="2" FontSize="15"/>
