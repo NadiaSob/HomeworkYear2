@@ -190,8 +190,7 @@ namespace GUIForFTP
         public ICommand HelpCommand
         {
             get
-            {
-                return new Command(obj =>
+                => new Command(obj =>
                 {
                     System.Windows.MessageBox.Show("Enter server's hostname and port and click 'Connect' button to connect to the server.\n" +
                         "Click 'Choose folder' button to choose a client's file system folder for downloading files.\n" +
@@ -202,7 +201,6 @@ namespace GUIForFTP
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
                 });
-            }
         }
 
         /// <summary>
@@ -211,8 +209,7 @@ namespace GUIForFTP
         public ICommand ChooseClientFolderCommand
         {
             get
-            {
-                return new Command(obj =>
+                => new Command(obj =>
                 {
                     FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
                     if (folderBrowser.ShowDialog() == DialogResult.OK)
@@ -221,7 +218,6 @@ namespace GUIForFTP
                         ChooseClientFolder(clientPath);
                     }
                 });
-            }
         }
 
         /// <summary>
@@ -239,8 +235,7 @@ namespace GUIForFTP
         public ICommand DownloadAllCommand
         {
             get
-            {
-                return new Command(async obj =>
+                => new Command(async obj =>
                 {
                     if (clientPath == "Choose folder")
                     {
@@ -257,7 +252,6 @@ namespace GUIForFTP
                         }
                     }
                 });
-            }
         }
 
         /// <summary>
