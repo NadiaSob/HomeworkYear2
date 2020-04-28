@@ -107,7 +107,7 @@ namespace SimpleFTP
             else
             {
                 var fileName = filePath.Substring(filePath.LastIndexOf('/') + 1);
-                using (var fileWriter = new StreamWriter(new FileStream(destination + "\\" + fileName, FileMode.Create)))
+                using (var fileWriter = new StreamWriter(new FileStream(destination + "/" + fileName, FileMode.Create)))
                 {
                     await fileWriter.WriteAsync(content);
                 }

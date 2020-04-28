@@ -3,11 +3,17 @@ using System.Windows.Input;
 
 namespace GUIForFTP
 {
+    /// <summary>
+    /// Class that implements ICommand.
+    /// </summary>
     public class Command : ICommand
     {
         private readonly Action<object> execute;
         private readonly Func<object, bool> canExecute;
 
+        /// <summary>
+        /// Occurs when changes occur that affect whether or not the command should execute.
+        /// </summary>
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
@@ -20,8 +26,14 @@ namespace GUIForFTP
             this.canExecute = canExecute;
         }
 
+        /// <summary>
+        /// Defines the method that determines whether the command can execute in its current state.
+        /// </summary>
         public bool CanExecute(object parameter) => canExecute == null || canExecute(parameter);
 
+        /// <summary>
+        /// Defines the method to be called when the command is invoked.
+        /// </summary>
         public void Execute(object parameter) => execute(parameter);
     }
 }

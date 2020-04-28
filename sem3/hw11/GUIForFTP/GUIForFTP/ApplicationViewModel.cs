@@ -13,33 +13,54 @@ using System.Windows.Input;
 
 namespace GUIForFTP
 {
+    /// <summary>
+    /// Class that implements the view model.
+    /// </summary>
     public class ApplicationViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        private Client client;
+        private Server server;
         private string hostname;
         private int port;
         private string serverPath;
         private string clientPath;
-        private Client client;
-        private Server server;
-        private string serverRoot;
+        private readonly string serverRoot;
         private List<(string, bool)> serverFolderList = new List<(string, bool)>();
         private List<(string, bool)> clientFolderList = new List<(string, bool)>();
         private string selectedItem;
 
+        /// <summary>
+        /// Handler for an event that occurs when a component property is changed.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Files and folders in the current folder on server.
+        /// </summary>
         public ObservableCollection<string> DisplayedServerFolderList { get; private set; } 
             = new ObservableCollection<string>();
 
+        /// <summary>
+        /// Files and folders in the current folder on client.
+        /// </summary>
         public ObservableCollection<string> DisplayedClientFolderList { get; private set; } 
             = new ObservableCollection<string>();
 
+        /// <summary>
+        /// Files in process of downloading.
+        /// </summary>
         public ObservableCollection<string> InProcessList { get; private set; } 
             = new ObservableCollection<string>();
 
+        /// <summary>
+        /// Downloaded files.
+        /// </summary>
         public ObservableCollection<string> DownloadedList { get; private set; } 
             = new ObservableCollection<string>();
 
+        /// <summary>
+        /// Selected item in server folder list.
+        /// </summary>
         public string SelectedItem
         {
             get
@@ -58,6 +79,9 @@ namespace GUIForFTP
             }
         }
 
+        /// <summary>
+        /// Path to current folder on server.
+        /// </summary>
         public string ServerPath
         {
             get
@@ -65,10 +89,13 @@ namespace GUIForFTP
             set
             {
                 serverPath = value;
-                NotifyPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
+        /// <summary>
+        /// Path to current folder on client.
+        /// </summary>
         public string ClientPath
         {
             get
@@ -76,7 +103,7 @@ namespace GUIForFTP
             set
             {
                 clientPath = value;
-                NotifyPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -94,7 +121,7 @@ namespace GUIForFTP
         }
 
         /// <summary>
-        /// Server port.
+        /// Port for connection.
         /// </summary>
         public string Port
         {
@@ -124,17 +151,15 @@ namespace GUIForFTP
             clientPath = "Choose folder";
         }
 
-        public void NotifyPropertyChanged([CallerMemberName] string prop = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        /// <summary>
+        /// Notifies that the component property is changed.
+        /// </summary>
+        public void OnPropertyChanged([CallerMemberName] string property = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
 
-        private void HandleError(string message)
-        {
-            System.Windows.MessageBox.Show("An error just occurred: " + message,
-                "Error", 
-                MessageBoxButton.OK, 
-                MessageBoxImage.Error);
-        }
-
+        /// <summary>
+        /// Connects client to server.
+        /// </summary>
         public ICommand Connect
         {
             get
@@ -167,6 +192,9 @@ namespace GUIForFTP
             }
         }
 
+        /// <summary>
+        /// Shows the previous folder on server.
+        /// </summary>
         public ICommand GoServerFolderUp
         {
             get
@@ -178,6 +206,9 @@ namespace GUIForFTP
             }
         }
 
+        /// <summary>
+        /// Shows the previous folder on client.
+        /// </summary>
         public ICommand GoClientFolderUp
         {
             get
@@ -196,6 +227,9 @@ namespace GUIForFTP
             }
         }
 
+        /// <summary>
+        /// Shows a hint for user to understand the interface of the application.
+        /// </summary>
         public ICommand Help
         {
             get
@@ -204,9 +238,9 @@ namespace GUIForFTP
                 {
                     System.Windows.MessageBox.Show("Enter server's hostname and port and click 'Connect' button to connect to the server.\n" +
                         "Click 'Choose folder' button to choose a client's file system folder for downloading files.\n" +
-                        "Double click on folder to open it; click on '..' button to go folder up.\n" +
-                        "Choose file and click 'Download' button or double click on the file to download it into the client's downloads folder.\n" +
-                        "Click 'Download all' button to download all files from the current server path into the client's downloads folder.\n",
+                        "Double click on folder to open it; click on '..' button to go back to the previous folder.\n" +
+                        "Choose file in the current server folder and click 'Download' button or double click on the file to download it into the client's downloads folder.\n" +
+                        "Click 'Download all' button to download all files from the current server folder into the client's downloads folder.\n",
                 "Help",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -214,6 +248,9 @@ namespace GUIForFTP
             }
         }
 
+        /// <summary>
+        /// Lets user choose folder in client's file system to download files.
+        /// </summary>
         public ICommand ChooseDownloadFolder
         {
             get
@@ -230,16 +267,23 @@ namespace GUIForFTP
             }
         }
 
+        /// <summary>
+        /// Downloads a selected file into the current client folder.
+        /// </summary>
         public ICommand Download
         {
             get
             {
-                return new Command(obj =>
+                return new Command(async obj =>
                 {
+                    await DownloadFile(selectedItem);
                 }, obj => serverFolderList.Count != 0 && selectedItem != null);
             }
         }
 
+        /// <summary>
+        /// Downloads all files in the current server folder into the current client folder.
+        /// </summary>
         public ICommand DownloadAll
         {
             get
@@ -255,6 +299,72 @@ namespace GUIForFTP
                         }
                     }
                 });
+            }
+        }
+
+        /// <summary>
+        /// Opens and shows the contents of the folder in client's file system.
+        /// </summary>
+        /// <param name="name">Name of the folder to open.</param>
+        public void OpenClientFolder(string name)
+        {
+            foreach (var item in clientFolderList)
+            {
+                if (item.Item1.EndsWith(name))
+                {
+                    if (item.Item2)
+                    {
+                        UpdateClientList(clientPath + $"/{name}");
+                        return;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Opens the folder or downloads file on server.
+        /// </summary>
+        /// <param name="name">Name of the item.</param>
+        public async Task OpenOrDownloadServerItem(string name)
+        {
+            if (IsDirectory(name))
+            {
+                await UpdateServerList(serverPath + $"/{name}");
+            }
+            else
+            {
+                await DownloadFile(name);
+            }
+        }
+
+        private async Task DownloadFile(string name)
+        {
+            try
+            {
+                if (clientPath == "Choose folder")
+                {
+                    HandleError("Choose downloads folder to download files into.");
+                    return;
+                }
+
+                var path = serverPath + "/" + name;
+
+                InProcessList.Add(name);
+
+                await client.Get(path, clientPath);
+
+                InProcessList.Remove(name);
+                DownloadedList.Add(name);
+                UpdateClientList(clientPath);
+            }
+            catch (Exception exception)
+            {
+                InProcessList.Remove(name);
+                HandleError(exception.Message);
             }
         }
 
@@ -274,7 +384,7 @@ namespace GUIForFTP
 
                 foreach (var file in files)
                 {
-                    clientFolderList.Add((file.Substring(file.LastIndexOf('/') + 1), true));
+                    clientFolderList.Add((file.Substring(file.LastIndexOf('/') + 1), false));
                 }
 
                 UpdateDisplayedClientFolderList();
@@ -295,26 +405,6 @@ namespace GUIForFTP
                 var name = item.Item1;
                 DisplayedClientFolderList.Add(name.Substring(name.LastIndexOf('\\') + 1));
             }
-        }
-
-        public void OpenClientFolder(string name)
-        {
-            foreach (var item in clientFolderList)
-            {
-                if (item.Item1.EndsWith(name))
-                {
-                    if (item.Item2)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        return;
-                    }    
-                }
-            }
-
-            UpdateClientList(clientPath + $"/{name}");
         }
 
         private async Task UpdateServerList(string path)
@@ -347,43 +437,12 @@ namespace GUIForFTP
             return false;
         }
 
-        public async Task OpenOrDownloadServerItem(string name)
+        private void HandleError(string message)
         {
-            if (IsDirectory(name))
-            {
-                await UpdateServerList(serverPath + $"/{name}");
-            }
-            else
-            {
-                await DownloadFile(name);
-            }
-        }
-
-        public async Task DownloadFile(string name)
-        {
-            try
-            {
-                if (clientPath == "Choose folder")
-                {
-                    HandleError("Choose downloads folder to download files into.");
-                    return;
-                }
-
-                var path = serverPath + "/" + name;
-
-                InProcessList.Add(name);
-
-                await client.Get(path, clientPath);
-
-                InProcessList.Remove(name);
-                DownloadedList.Add(name);
-                UpdateClientList(clientPath);
-            }
-            catch (Exception exception)
-            {
-                InProcessList.Remove(name);
-                HandleError(exception.Message);
-            }
+            System.Windows.MessageBox.Show("An error just occurred: " + message,
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
 }

@@ -24,8 +24,6 @@ namespace GUIForFTP
         private void HandleClientDoubleClick(object sender, RoutedEventArgs e) =>
             viewModel.OpenClientFolder((sender as ListBoxItem).Content.ToString());
 
-        private async void DownloadButtonClick(object sender, RoutedEventArgs e) => await viewModel.DownloadFile(serverList.SelectedItem.ToString());
-
         private void SelectedItemChanged(object sender, SelectionChangedEventArgs e) => viewModel.SelectedItem = serverList.SelectedItem?.ToString();
     }
 }
