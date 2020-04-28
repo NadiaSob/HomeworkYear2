@@ -62,7 +62,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <Button Command ="{Binding Help}" Content="?" Margin="2" FontSize="15"/>
+                        <Button Command ="{Binding HelpCommand}" Content="?" Margin="2" FontSize="15"/>
                     </Grid>
 
                     <Grid Grid.Column="1">
@@ -72,7 +72,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Column="0">
-                            <Button Command ="{Binding GoServerFolderUp}" Content=".." Margin="2" FontSize="15"/>
+                            <Button Command ="{Binding GoServerFolderUpCommand}" Content=".." Margin="2" FontSize="15"/>
                         </Grid>
                         <Grid Grid.Column="1">
                             <Label Content="Path:" FontSize="15" FontWeight="Normal" HorizontalAlignment="Left"/>
@@ -105,10 +105,10 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <Button Content="Download" Command="{Binding Download}" Margin="2" FontSize="15"/>
+                        <Button Content="Download" Command="{Binding DownloadCommand}" Margin="2" FontSize="15"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <Button Content="Download all" Command="{Binding DownloadAll}" Margin="2" FontSize="15"/>
+                        <Button Content="Download all" Command="{Binding DownloadAllCommand}" Margin="2" FontSize="15"/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -137,10 +137,10 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <Button Command ="{Binding GoClientFolderUp}" Content=".." Margin="2" FontSize="15"/>
+                        <Button Command ="{Binding GoClientFolderUpCommand}" Content=".." Margin="2" FontSize="15"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <Button Command="{Binding ChooseDownloadFolder}" Content="{Binding Path=ClientPath}" Margin="2" FontSize="15"/>
+                        <Button Command="{Binding ChooseClientFolderCommand}" Content="{Binding Path=ClientPath}" Margin="2" FontSize="15"/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -208,7 +208,7 @@
                 </Grid>
             </Grid>
             <Grid Grid.Row="1">
-                <Button Command="{Binding Connect}" Content="CONNECT" Margin="90,1,90,5" FontSize="20"/>
+                <Button Command="{Binding ConnectCommand}" Content="CONNECT" Margin="90,1,90,5" FontSize="20"/>
             </Grid>
         </Grid>
 

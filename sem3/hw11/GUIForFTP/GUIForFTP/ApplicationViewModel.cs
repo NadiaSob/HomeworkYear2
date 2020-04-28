@@ -142,95 +142,52 @@ namespace GUIForFTP
             }
         }
 
+        /// <summary>
+        /// Determines whether the client is connected to the server.
+        /// </summary>
+        public bool IsConnected { get; private set; }
+
         public ApplicationViewModel(string hostname, int port)
         {
             this.hostname = hostname;
             this.port = port;
+            IsConnected = false;
             serverRoot = "../../..";
             serverPath = serverRoot;
             clientPath = "Choose folder";
         }
 
         /// <summary>
-        /// Notifies that the component property is changed.
+        /// Command for connecting client to server.
         /// </summary>
-        public void OnPropertyChanged([CallerMemberName] string property = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-
-        /// <summary>
-        /// Connects client to server.
-        /// </summary>
-        public ICommand Connect
+        public ICommand ConnectCommand
         {
             get
-            {
-                return new Command(async obj =>
-                {
-                    try
-                    {
-                        var startServer = new Thread(async () =>
-                        {
-                            if (server == null)
-                            {
-                                server = new Server(port);
-                                await server.Start();
-                            }
-                        });
-                        startServer.Start();
-
-                        client = new Client(hostname, port);
-                        client.Connect();
-                        await UpdateServerList(serverRoot);
-                    }
-                    catch (Exception exception)
-                    {
-                        HandleError(exception.Message);
-                        serverFolderList.Clear();
-                        DisplayedServerFolderList.Clear();
-                    }
-                }, obj => hostname != "" && port != -1);
-            }
+                => new Command(async obj => await Connect(), obj => hostname != "" && port != -1);
         }
 
         /// <summary>
-        /// Shows the previous folder on server.
+        /// Command for showing the previous folder on server.
         /// </summary>
-        public ICommand GoServerFolderUp
+        public ICommand GoServerFolderUpCommand
         {
             get
-            {
-                return new Command(async obj =>
-                {
-                    await UpdateServerList(serverPath.Substring(0, serverPath.LastIndexOf('/')));
-                }, obj => serverPath != serverRoot);
-            }
+                => new Command(async obj => await GoServerFolderUp(), obj => serverPath != serverRoot);
         }
 
         /// <summary>
-        /// Shows the previous folder on client.
+        /// Command for showing the previous folder on client.
         /// </summary>
-        public ICommand GoClientFolderUp
+        public ICommand GoClientFolderUpCommand
         {
             get
-            {
-                return new Command(obj =>
-                {
-                    var newPath = clientPath.Substring(0, clientPath.LastIndexOf('/'));
-
-                    if (newPath.Length < 3 && !newPath.EndsWith("/"))
-                    {
-                        newPath += "/";
-                    }
-
-                    UpdateClientList(newPath);
-                }, obj => clientPath != "Choose folder" && clientPath.Length > 3);
-            }
+                => new Command(obj => GoClientFolderUp(), obj => clientPath != "Choose folder" && clientPath.Length > 3);
         }
 
         /// <summary>
-        /// Shows a hint for user to understand the interface of the application.
+        /// Command for showing a hint for user to understand the interface of the application.
         /// </summary>
-        public ICommand Help
+        public ICommand HelpCommand
         {
             get
             {
@@ -249,9 +206,9 @@ namespace GUIForFTP
         }
 
         /// <summary>
-        /// Lets user choose folder in client's file system to download files.
+        /// Command for letting user choose folder in client's file system to download files.
         /// </summary>
-        public ICommand ChooseDownloadFolder
+        public ICommand ChooseClientFolderCommand
         {
             get
             {
@@ -261,35 +218,36 @@ namespace GUIForFTP
                     if (folderBrowser.ShowDialog() == DialogResult.OK)
                     {
                         ClientPath = folderBrowser.SelectedPath.Replace('\\', '/');
-                        UpdateClientList(clientPath);
+                        ChooseClientFolder(clientPath);
                     }
                 });
             }
         }
 
         /// <summary>
-        /// Downloads a selected file into the current client folder.
+        /// Command for downloading a selected file into the current client folder.
         /// </summary>
-        public ICommand Download
+        public ICommand DownloadCommand
         {
             get
-            {
-                return new Command(async obj =>
-                {
-                    await DownloadFile(selectedItem);
-                }, obj => serverFolderList.Count != 0 && selectedItem != null);
-            }
+                => new Command(async obj => await DownloadFile(selectedItem), obj => serverFolderList.Count != 0 && selectedItem != null);
         }
 
         /// <summary>
-        /// Downloads all files in the current server folder into the current client folder.
+        /// Command for downloading all files in the current server folder into the current client folder.
         /// </summary>
-        public ICommand DownloadAll
+        public ICommand DownloadAllCommand
         {
             get
             {
                 return new Command(async obj =>
                 {
+                    if (clientPath == "Choose folder")
+                    {
+                        HandleError("Choose downloads folder to download files into.");
+                        return;
+                    }
+
                     foreach (var item in serverFolderList)
                     {
                         if (!item.Item2)
@@ -301,6 +259,68 @@ namespace GUIForFTP
                 });
             }
         }
+
+        /// <summary>
+        /// Notifies that the component property is changed.
+        /// </summary>
+        public void OnPropertyChanged([CallerMemberName] string property = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+
+        /// <summary>
+        /// Connects client to server.
+        /// </summary>
+        public async Task Connect()
+        {
+            try
+            {
+                var startServer = new Thread(async () =>
+                {
+                    if (server == null)
+                    {
+                        server = new Server(port);
+                        await server.Start();
+                    }
+                });
+                startServer.Start();
+
+                client = new Client(hostname, port);
+                client.Connect();
+                IsConnected = true;
+                await UpdateServerList(serverRoot);
+            }
+            catch (Exception exception)
+            {
+                HandleError(exception.Message);
+                serverFolderList.Clear();
+                DisplayedServerFolderList.Clear();
+                IsConnected = false;
+            }
+        }
+
+        /// <summary>
+        /// Shows the previous folder on server.
+        /// </summary>
+        public async Task GoServerFolderUp() => await UpdateServerList(serverPath.Substring(0, serverPath.LastIndexOf('/')));
+
+        /// <summary>
+        /// Shows the previous folder on client.
+        /// </summary>
+        public void GoClientFolderUp()
+        {
+            var newPath = clientPath.Substring(0, clientPath.LastIndexOf('/'));
+
+            if (newPath.Length < 3 && !newPath.EndsWith("/"))
+            {
+                newPath += "/";
+            }
+
+            UpdateClientList(newPath);
+        }
+
+        /// <summary>
+        /// Chooses folder in client's file system to download files.
+        /// </summary>
+        public void ChooseClientFolder(string path) => UpdateClientList(path);
 
         /// <summary>
         /// Opens and shows the contents of the folder in client's file system.
