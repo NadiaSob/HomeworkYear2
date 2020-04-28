@@ -1,4 +1,4 @@
-﻿using MyNUnit.Attributes;
+﻿using Attributes;
 
 namespace IncorrectTestProject
 {

@@ -47,9 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MyNUnit\MyNUnit.csproj">
-      <Project>{1f70e529-4366-470f-b396-b9e08a9a7e7b}</Project>
-      <Name>MyNUnit</Name>
+    <ProjectReference Include="..\Attributes\Attributes.csproj">
+      <Project>{6aafd800-17dc-4aee-aa32-bc1b6fce513d}</Project>
+      <Name>Attributes</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

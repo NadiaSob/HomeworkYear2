@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,7 +19,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void PassedTestsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\PassedTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\PassedTestProject\\obj");
             var passedTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)
@@ -57,7 +58,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void TimeTest()
         {
-            myNUnit.RunTests("..\\..\\..\\PassedTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\PassedTestProject\\obj");
             TestInfo timeTest = null;
 
             foreach (var info in testInfo)
@@ -76,7 +77,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void FailedTestsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\FailedTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\FailedTestProject\\obj");
             var failedTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)
@@ -115,7 +116,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void ExceptionTestsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\ExceptionTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\ExceptionTestProject\\obj");
             var exceptionTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)
@@ -160,7 +161,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void AfterMethodsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterTestProject\\obj");
 
             var afterTestInfo = new ConcurrentBag<TestInfo>();
 
@@ -201,7 +202,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void BeforeMethodsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterTestProject\\obj");
 
             var beforeTestInfo = new ConcurrentBag<TestInfo>();
 
@@ -226,7 +227,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void BeforeClassMethodsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\obj");
 
             var beforeClassTestInfo = new ConcurrentBag<TestInfo>();
 
@@ -263,7 +264,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void AfterClassMethodsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\BeforeAndAfterClassTestProject\\obj");
 
             var afterClassTestInfo = new ConcurrentBag<TestInfo>();
             var additionalAfterClassTestInfo = new ConcurrentBag<TestInfo>();
@@ -313,7 +314,7 @@ namespace MyNUnit.Tests
         [TestMethod]
         public void IgnoreTest()
         {
-            myNUnit.RunTests("..\\..\\..\\IgnoreTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\IgnoreTestProject\\obj");
             var ignoreTestInfo = new ConcurrentBag<TestInfo>();
 
             foreach (var info in testInfo)
@@ -353,10 +354,10 @@ namespace MyNUnit.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public void IncorrectMethodsTest()
         {
-            myNUnit.RunTests("..\\..\\..\\IncorrectTestProject\\bin");
+            myNUnit.RunTests("..\\..\\..\\IncorrectTestProject\\obj");
         }
 
         private MyNUnit myNUnit;
-        private ConcurrentBag<TestInfo> testInfo;
+        private IEnumerable<TestInfo> testInfo;
     }
 }

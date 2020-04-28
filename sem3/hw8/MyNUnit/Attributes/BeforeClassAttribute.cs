@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyNUnit.Attributes
+namespace Attributes
 {
     /// <summary>
     /// Attribute for the method to be invoked before all of the tests in class.

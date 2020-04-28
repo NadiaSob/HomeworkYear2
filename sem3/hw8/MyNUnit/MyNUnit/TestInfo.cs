@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyNUnit
 {
@@ -41,8 +37,14 @@ namespace MyNUnit
         /// </summary>
         public TimeSpan Time { get; private set; }
 
-        public TestInfo(string className, string name, bool isPassed, 
-            bool isIgnored, string ignoringReason, TimeSpan time)
+        /// <summary>
+        /// The exception that the test throws or null if the test is passed.
+        /// </summary>
+        public Exception Exception { get; private set; }
+
+        public TestInfo(string className, string name, bool isPassed,
+            bool isIgnored, string ignoringReason,
+            TimeSpan time, Exception exception)
         {
             ClassName = className;
             Name = name;
@@ -50,6 +52,7 @@ namespace MyNUnit
             IsIgnored = isIgnored;
             IgnoringReason = ignoringReason;
             Time = time;
+            Exception = exception;
         }
     }
 }

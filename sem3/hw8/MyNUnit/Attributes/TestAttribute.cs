@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyNUnit.Attributes
+namespace Attributes
 {
     /// <summary>
     /// Attribute for test method.

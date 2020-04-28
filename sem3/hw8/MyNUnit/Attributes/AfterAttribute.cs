@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyNUnit.Attributes
+namespace Attributes
 {
     /// <summary>
     /// Attribute for the method to be invoked after each test in class.

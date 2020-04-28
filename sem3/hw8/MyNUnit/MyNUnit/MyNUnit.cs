@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
-using MyNUnit.Attributes;
 using System.Diagnostics;
+using Attributes;
 
 namespace MyNUnit
 {
@@ -18,7 +18,7 @@ namespace MyNUnit
         /// <summary>
         /// Collection of the TestsInfo elements.
         /// </summary>
-        public ConcurrentBag<TestInfo> TestsInfo { get; private set; } = new ConcurrentBag<TestInfo>();
+        public IEnumerable<TestInfo> TestsInfo = new ConcurrentBag<TestInfo>();
 
         /// <summary>
         /// Runs tests in all assemblies located in the given path.
@@ -52,10 +52,7 @@ namespace MyNUnit
                 throw new FileNotFoundException("No assembly is found");
             }
 
-            foreach (var assembly in assemblies)
-            {
-                loadedAssemblies.Add(Assembly.LoadFrom(assembly));
-            }
+            Parallel.ForEach(assemblies, assembly => loadedAssemblies.Add(Assembly.LoadFrom(assembly)));
             return loadedAssemblies;
         }
 
@@ -69,6 +66,35 @@ namespace MyNUnit
 
             var testMethods = new List<MethodInfo>();
 
+            DistributeMethods(type, beforeClassMethods, afterClassMethods, beforeMethods, afterMethods, testMethods);
+
+            if (beforeMethods.Count > 1 || afterMethods.Count > 1)
+            {
+                throw new InvalidOperationException("There must not be more than one Before and After methods in one class.");
+            }
+
+            RunMethodsWithOneAttribute(beforeClassMethods, null);
+
+            var instance = Activator.CreateInstance(type);
+
+            if (testMethods.Count() != 0)
+            {
+                try
+                {
+                    Parallel.ForEach(testMethods, test => RunTest(test, instance, beforeMethods, afterMethods));
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException;
+                }
+            }
+
+            RunMethodsWithOneAttribute(afterClassMethods, null);
+        }
+
+        private void DistributeMethods(Type type, List<MethodInfo> beforeClassMethods, List<MethodInfo> afterClassMethods,
+            List<MethodInfo> beforeMethods, List<MethodInfo> afterMethods, List<MethodInfo> testMethods)
+        {
             foreach (var methodInfo in type.GetMethods())
             {
                 foreach (var attribute in Attribute.GetCustomAttributes(methodInfo))
@@ -76,104 +102,37 @@ namespace MyNUnit
                     switch (attribute.GetType())
                     {
                         case Type beforeClassAtr when beforeClassAtr == typeof(BeforeClassAttribute):
+                            CheckMethodToBeCorrect<BeforeClassAttribute>(methodInfo);
                             beforeClassMethods.Add(methodInfo);
                             break;
 
                         case Type afterClassAtr when afterClassAtr == typeof(AfterClassAttribute):
+                            CheckMethodToBeCorrect<AfterClassAttribute>(methodInfo);
                             afterClassMethods.Add(methodInfo);
                             break;
 
                         case Type testAtr when testAtr == typeof(TestAttribute):
+                            CheckMethodToBeCorrect<TestAttribute>(methodInfo);
                             testMethods.Add(methodInfo);
                             break;
 
                         case Type beforeAtr when beforeAtr == typeof(BeforeAttribute):
+                            CheckMethodToBeCorrect<BeforeAttribute>(methodInfo);
                             beforeMethods.Add(methodInfo);
                             break;
 
                         case Type afterAtr when afterAtr == typeof(AfterAttribute):
+                            CheckMethodToBeCorrect<AfterAttribute>(methodInfo);
                             afterMethods.Add(methodInfo);
                             break;
                     }
-                }
-            }
-
-            var instance = Activator.CreateInstance(type);
-
-            if (beforeClassMethods.Count() != 0)
-            {
-                try
-                {
-                    Parallel.ForEach(beforeClassMethods, method =>
-                    {
-                        CheckMethodToBeCorrect(method);
-                        if (!method.IsStatic)
-                        {
-                            throw new InvalidOperationException("BeforeClass method must be static");
-                        }
-                        RunMethod(method, null);
-                    });
-                }
-                catch (AggregateException exception)
-                {
-                    throw exception.InnerException;
-                }
-            }
-
-            if (testMethods.Count() != 0)
-            {
-                try
-                {
-                    Parallel.ForEach(testMethods, test =>
-                    {
-                        CheckMethodToBeCorrect(test);
-                        RunTest(test, instance, beforeMethods, afterMethods);
-                    });
-                }
-                catch (AggregateException exception)
-                {
-                    throw exception.InnerException;
-                }
-            }
-
-            if (afterClassMethods.Count() != 0)
-            {
-                try
-                {
-                    Parallel.ForEach(afterClassMethods, method =>
-                    {
-                        CheckMethodToBeCorrect(method);
-                        if (!method.IsStatic)
-                        {
-                            throw new InvalidOperationException("AfterClass method must be static");
-                        }
-                        RunMethod(method, null);
-                    });
-                }
-                catch (AggregateException exception)
-                {
-                    throw exception.InnerException;
                 }
             }
         }
 
         private void RunTest(MethodInfo test, object instance, List<MethodInfo> beforeMethods, List<MethodInfo> afterMethods)
         {
-            if (beforeMethods.Count() != 0)
-            {
-                try
-                {
-                    Parallel.ForEach(beforeMethods, method =>
-                    {
-                        CheckMethodToBeCorrect(method);
-                        RunMethod(method, instance);
-                    });
-                }
-                catch (AggregateException exception)
-                {
-                    throw exception.InnerException;
-                }
-            }
+            RunMethodsWithOneAttribute(beforeMethods, instance);
 
             var attribute = test.GetCustomAttribute<TestAttribute>();
 
@@ -183,6 +142,7 @@ namespace MyNUnit
             var isIgnored = false;
             var time = TimeSpan.Zero;
             string ignoringReason = null;
+            Exception testException = null;
 
             TestInfo testInfo = null;
 
@@ -191,8 +151,8 @@ namespace MyNUnit
                 isIgnored = true;
                 ignoringReason = attribute.Ignore;
                 isPassed = true;
-                testInfo = new TestInfo(className, name, isPassed, isIgnored, ignoringReason, time);
-                TestsInfo.Add(testInfo);
+                testInfo = new TestInfo(className, name, isPassed, isIgnored, ignoringReason, time, testException);
+                ((ConcurrentBag<TestInfo>)TestsInfo).Add(testInfo);
                 return;
             }
 
@@ -216,28 +176,33 @@ namespace MyNUnit
                     stopwatch.Stop();
                     isPassed = true;
                 }
+                else
+                {
+                    testException = exception.InnerException;
+                }
             }
             finally
             {
                 stopwatch.Stop();
                 time = stopwatch.Elapsed;
-                testInfo = new TestInfo(className, name, isPassed, isIgnored, ignoringReason, time);
-                TestsInfo.Add(testInfo);
+                testInfo = new TestInfo(className, name, isPassed, isIgnored, ignoringReason, time, testException);
+                ((ConcurrentBag<TestInfo>)TestsInfo).Add(testInfo);
 
-                if (afterMethods.Count() != 0)
+                RunMethodsWithOneAttribute(afterMethods, instance);
+            }
+        }
+
+        private void RunMethodsWithOneAttribute(List<MethodInfo> methods, object instance)
+        {
+            if (methods.Count() != 0)
+            {
+                try
                 {
-                    try
-                    {
-                        Parallel.ForEach(afterMethods, method =>
-                        {
-                            CheckMethodToBeCorrect(method);
-                            RunMethod(method, instance);
-                        });
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException;
-                    }
+                    Parallel.ForEach(methods, method => RunMethod(method, instance));
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException;
                 }
             }
         }
@@ -274,6 +239,7 @@ namespace MyNUnit
                     else
                     {
                         Console.WriteLine("Failed!");
+                        Console.WriteLine($"Test has thrown an exception: {test.Exception}");
                         allTestsPassed = false;
                     }
                 }
@@ -293,7 +259,7 @@ namespace MyNUnit
             }
         }
         
-        private void CheckMethodToBeCorrect(MethodInfo method)
+        private void CheckMethodToBeCorrect<T>(MethodInfo method) where T : Attribute
         {
             if (method.ReturnType != typeof(void))
             {
@@ -303,6 +269,14 @@ namespace MyNUnit
             if (method.GetParameters().Length != 0)
             {
                 throw new InvalidOperationException($"Method {method.Name} must not have any input parameters");
+            }
+
+            if (typeof(T) == typeof(BeforeClassAttribute) || typeof(T) == typeof(AfterClassAttribute))
+            {
+                if (!method.IsStatic)
+                {
+                    throw new InvalidOperationException("BeforeClass and AfterClass methods must be static");
+                }
             }
         }
     }

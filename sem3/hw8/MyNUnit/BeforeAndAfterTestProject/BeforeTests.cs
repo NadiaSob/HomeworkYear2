@@ -1,4 +1,4 @@
-﻿using MyNUnit.Attributes;
+﻿using Attributes;
 using System;
 
 namespace BeforeAndAfterTestProject
