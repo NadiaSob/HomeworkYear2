@@ -31,12 +31,13 @@ namespace GUIForFTP.Tests
         }
 
         [TestMethod]
-        public async Task ConnectTest()
+        public void ConnectTest()
         {
             Assert.IsFalse(viewModel.IsConnected);
 
-            await viewModel.Connect();
-
+            viewModel.ConnectCommand.Execute(null);
+            Thread.Sleep(2500);
+            
             Assert.IsTrue(viewModel.IsConnected);
             Assert.IsTrue(viewModel.DisplayedServerFolderList.Count != 0);
         }
@@ -44,7 +45,8 @@ namespace GUIForFTP.Tests
         [TestMethod]
         public async Task OpenServerFolderTest()
         {
-            await viewModel.Connect();
+            viewModel.ConnectCommand.Execute(null);
+            Thread.Sleep(2500);
             await viewModel.OpenOrDownloadServerItem("TestFiles");
 
             Assert.AreEqual("/TestFiles", viewModel.ServerPath);
@@ -59,7 +61,8 @@ namespace GUIForFTP.Tests
         [TestMethod]
         public async Task ServerFolderUpTest()
         {
-            await viewModel.Connect();
+            viewModel.ConnectCommand.Execute(null);
+            Thread.Sleep(2500);
             var rootServerFolder = viewModel.DisplayedServerFolderList;
 
             await viewModel.OpenOrDownloadServerItem("TestFiles");
@@ -80,9 +83,10 @@ namespace GUIForFTP.Tests
         }
 
         [TestMethod]
-        public async Task OpenClientFolderTest()
+        public void OpenClientFolderTest()
         {
-            await viewModel.Connect();
+            viewModel.ConnectCommand.Execute(null);
+            Thread.Sleep(2500);
             var path = Directory.GetCurrentDirectory() + "/../../../TestFiles";
 
             viewModel.ChooseClientFolder(path);
@@ -95,9 +99,10 @@ namespace GUIForFTP.Tests
         }
 
         [TestMethod]
-        public async Task ClientFolderUpTest()
+        public void ClientFolderUpTest()
         {
-            await viewModel.Connect();
+            viewModel.ConnectCommand.Execute(null);
+            Thread.Sleep(2500);
             var path = Directory.GetCurrentDirectory() + "/../../../TestFiles";
 
             viewModel.ChooseClientFolder(path);

@@ -171,7 +171,14 @@ namespace GUIForFTP
         public ICommand ConnectCommand
         {
             get
-                => new Command(async obj => await Connect(), obj => hostname != "" && port != -1);
+                => new Command(async obj =>
+                {
+                    await Task.Run(() => Connect());
+                    if (IsConnected)
+                    {
+                        await UpdateServerList(serverRoot);
+                    }
+                }, obj => hostname != "" && port != -1);
         }
 
         /// <summary>
@@ -271,20 +278,17 @@ namespace GUIForFTP
         /// <summary>
         /// Connects client to server.
         /// </summary>
-        public async Task Connect()
+        public void Connect()
         {
             try
             {
                 client = new Client(hostname, port);
                 client.Connect();
                 IsConnected = true;
-                await UpdateServerList(serverRoot);
             }
             catch (Exception exception)
             {
                 HandleError(exception.Message);
-                serverFolderList.Clear();
-                DisplayedServerFolderList.Clear();
                 IsConnected = false;
             }
         }
