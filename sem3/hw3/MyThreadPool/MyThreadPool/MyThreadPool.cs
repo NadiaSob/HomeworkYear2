@@ -80,12 +80,15 @@ namespace MyThreadPool
         {
             var myTask = new MyTask<TResult>(supplier, this);
 
-            if (!cancellationToken.Token.IsCancellationRequested)
+            lock (lockObject)
             {
-                if (numberOfWorkingThreads != 0)
+                if (!cancellationToken.Token.IsCancellationRequested)
                 {
-                    EnqueueTask(myTask.Calculate);
-                    return myTask;
+                    if (numberOfWorkingThreads != 0)
+                    {
+                        EnqueueTask(myTask.Calculate);
+                        return myTask;
+                    }
                 }
             }
 
@@ -103,7 +106,10 @@ namespace MyThreadPool
         /// </summary>
         public void Shutdown()
         {
-            cancellationToken.Cancel();
+            lock (lockObject)
+            {
+                cancellationToken.Cancel();
+            }
 
             while (numberOfWorkingThreads != 0)
             {
