@@ -14,17 +14,17 @@ namespace MyThreadPool
 
         private int numberOfWorkingThreads = 0;
 
-        private ConcurrentQueue<Action> taskQueue = new ConcurrentQueue<Action>();
+        private readonly ConcurrentQueue<Action> taskQueue = new ConcurrentQueue<Action>();
 
-        private CancellationTokenSource cancellationToken = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private Thread[] threads;
 
-        private AutoResetEvent newTaskAvailable = new AutoResetEvent(false);
+        private readonly AutoResetEvent newTaskAvailable = new AutoResetEvent(false);
 
-        private AutoResetEvent threadStopped = new AutoResetEvent(false);
+        private readonly AutoResetEvent threadStopped = new AutoResetEvent(false);
 
-        private object lockObject = new object();
+        private readonly object lockObject = new object();
 
         public MyThreadPool(int numberOfThreads)
         {
@@ -154,13 +154,13 @@ namespace MyThreadPool
 
             private AggregateException aggregateException;
 
-            private ManualResetEvent isCompletedEvent = new ManualResetEvent(false);
+            private readonly ManualResetEvent isCompletedEvent = new ManualResetEvent(false);
 
-            private MyThreadPool myThreadPool;
+            private readonly MyThreadPool myThreadPool;
 
-            private Queue<Action> localTaskQueue = new Queue<Action>();
+            private readonly Queue<Action> localTaskQueue = new Queue<Action>();
 
-            private object queueLockObject = new object();
+            private readonly object queueLockObject = new object();
 
             public MyTask(Func<TResult> supplier, MyThreadPool myThreadPool)
             {
