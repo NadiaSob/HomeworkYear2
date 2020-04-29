@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUIForFTP", "GUIForFTP\GUIForFTP.csproj", "{8629B83D-FF77-45A6-891F-1E4B4B8A6328}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFTP", "SimpleFTP\SimpleFTP.csproj", "{6FBD470E-5737-48D7-9A81-C4448BEDD7F9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUIForFTP.Tests", "GUIForFTP.Tests\GUIForFTP.Tests.csproj", "{53A45ED9-DFFA-43FD-99D9-96FA76FEABF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTPClient", "FTPClient\FTPClient.csproj", "{D7106FD4-3214-45B1-8638-5484A36D55A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTPServer", "FTPServer\FTPServer.csproj", "{E174EF35-CDDC-4561-B5D3-2FDDC2972C55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +21,18 @@ Global
 		{8629B83D-FF77-45A6-891F-1E4B4B8A6328}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8629B83D-FF77-45A6-891F-1E4B4B8A6328}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8629B83D-FF77-45A6-891F-1E4B4B8A6328}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6FBD470E-5737-48D7-9A81-C4448BEDD7F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6FBD470E-5737-48D7-9A81-C4448BEDD7F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6FBD470E-5737-48D7-9A81-C4448BEDD7F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6FBD470E-5737-48D7-9A81-C4448BEDD7F9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{53A45ED9-DFFA-43FD-99D9-96FA76FEABF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{53A45ED9-DFFA-43FD-99D9-96FA76FEABF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53A45ED9-DFFA-43FD-99D9-96FA76FEABF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53A45ED9-DFFA-43FD-99D9-96FA76FEABF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7106FD4-3214-45B1-8638-5484A36D55A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7106FD4-3214-45B1-8638-5484A36D55A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7106FD4-3214-45B1-8638-5484A36D55A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7106FD4-3214-45B1-8638-5484A36D55A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E174EF35-CDDC-4561-B5D3-2FDDC2972C55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E174EF35-CDDC-4561-B5D3-2FDDC2972C55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E174EF35-CDDC-4561-B5D3-2FDDC2972C55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E174EF35-CDDC-4561-B5D3-2FDDC2972C55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

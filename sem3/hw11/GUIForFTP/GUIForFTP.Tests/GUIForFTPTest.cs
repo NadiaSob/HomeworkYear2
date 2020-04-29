@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FTPServer;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GUIForFTP.Tests
@@ -17,6 +19,14 @@ namespace GUIForFTP.Tests
         {
             hostname = "localhost";
             port = 1234;
+
+            var startServer = new Thread(async () =>
+            {
+                var server = new Server(port);
+                await server.Start();
+            });
+            startServer.Start();
+
             viewModel = new ApplicationViewModel(hostname, port);
         }
 

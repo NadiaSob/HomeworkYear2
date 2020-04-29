@@ -98,9 +98,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleFTP\SimpleFTP.csproj">
-      <Project>{6fbd470e-5737-48d7-9a81-c4448bedd7f9}</Project>
-      <Name>SimpleFTP</Name>
+    <ProjectReference Include="..\FTPClient\FTPClient.csproj">
+      <Project>{d7106fd4-3214-45b1-8638-5484a36d55a2}</Project>
+      <Name>FTPClient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

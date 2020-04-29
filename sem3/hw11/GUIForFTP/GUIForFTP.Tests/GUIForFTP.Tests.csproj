@@ -53,6 +53,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FTPServer\FTPServer.csproj">
+      <Project>{e174ef35-cddc-4561-b5d3-2fddc2972c55}</Project>
+      <Name>FTPServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GUIForFTP\GUIForFTP.csproj">
       <Project>{8629b83d-ff77-45a6-891f-1e4b4b8a6328}</Project>
       <Name>GUIForFTP</Name>

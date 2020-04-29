@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleFTP
+namespace FTPServer
 {
     /// <summary>
     /// Class implementing FTP server.
@@ -30,7 +29,7 @@ namespace SimpleFTP
             try
             {
                 listener.Start();
-                
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var client = await listener.AcceptTcpClientAsync();
@@ -53,7 +52,7 @@ namespace SimpleFTP
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         var request = (await reader.ReadLineAsync()).Split(' ');
-                        
+
                         if (request[0] == "1")
                         {
                             await ListResponse(request[1], writer);
@@ -88,10 +87,10 @@ namespace SimpleFTP
 
             foreach (var file in files)
             {
-                var fileName = file.Replace(path, ""); 
+                var fileName = file.Replace(path, "");
                 response += $".{fileName} false ";
             }
-            
+
             await writer.WriteLineAsync(response);
         }
 

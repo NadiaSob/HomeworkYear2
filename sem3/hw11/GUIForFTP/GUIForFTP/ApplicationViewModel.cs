@@ -1,11 +1,10 @@
-﻿using SimpleFTP;
+﻿using FTPClient;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -19,7 +18,6 @@ namespace GUIForFTP
     public class ApplicationViewModel : INotifyPropertyChanged
     {
         private Client client;
-        private Server server;
         private string hostname;
         private int port;
         private string serverPath;
@@ -116,6 +114,11 @@ namespace GUIForFTP
                 => hostname;
             set
             {
+                if (IsConnected)
+                {
+                    return;
+                }
+
                 hostname = value;
             }
         }
@@ -135,7 +138,12 @@ namespace GUIForFTP
             }
             set
             {
-                if(!int.TryParse(value, out port))
+                if (IsConnected)
+                {
+                    return;
+                }
+
+                if (!int.TryParse(value, out port))
                 {
                     port = -1;
                 }
@@ -211,7 +219,7 @@ namespace GUIForFTP
             get
                 => new Command(obj =>
                 {
-                    FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
+                    var folderBrowser = new FolderBrowserDialog();
                     if (folderBrowser.ShowDialog() == DialogResult.OK)
                     {
                         ClientPath = folderBrowser.SelectedPath.Replace('\\', '/');
@@ -267,16 +275,6 @@ namespace GUIForFTP
         {
             try
             {
-                var startServer = new Thread(async () =>
-                {
-                    if (server == null)
-                    {
-                        server = new Server(port);
-                        await server.Start();
-                    }
-                });
-                startServer.Start();
-
                 client = new Client(hostname, port);
                 client.Connect();
                 IsConnected = true;
@@ -329,12 +327,8 @@ namespace GUIForFTP
                     if (item.Item2)
                     {
                         UpdateClientList(clientPath + $"/{name}");
-                        return;
                     }
-                    else
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
         }

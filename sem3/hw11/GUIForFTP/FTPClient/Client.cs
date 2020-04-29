@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace SimpleFTP
+namespace FTPClient
 {
     /// <summary>
     /// Class implementing FTP client.
